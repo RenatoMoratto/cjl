@@ -533,6 +533,163 @@
           { "text": "Enche este lugar, vive em nós", "time": 999 }
         ]
       }
+    },
+    {
+      "id": 8,
+      "status": "active",
+      "title": "Ele Voltará",
+      "author": "Coral Jovem de Londrina",
+      "musicPath": "/songs/ele-voltara",
+      "imageUrl": "/images/logo-fundo.webp",
+      "lyrics": {
+        "lines": [
+          {
+            "text": "Há muito tempo temos visto os sinais acontecendo",
+            "time": 22,
+            "isSolo": false
+          },
+          {
+            "text": "Há muitos anos nós ouvimos que Jesus irá voltar",
+            "time": 27,
+            "isSolo": false
+          },
+          {
+            "text": "Já muitas vezes escutamos de sua morte lá na cruz",
+            "time": 33,
+            "isSolo": false
+          },
+          {
+            "text": "Há muito tempo esperamos pela volta de Jesus",
+            "time": 38,
+            "isSolo": false
+          },
+          {
+            "text": "Quero falar do seu amor por mim",
+            "time": 44,
+            "isSolo": false
+          },
+          {
+            "text": "Quero anunciar a quem quiser ouvir",
+            "time": 49,
+            "isSolo": false
+          },
+          {
+            "text": "Já ouço os passos de um Deus que se aproxima",
+            "time": 53,
+            "isSolo": false
+          },
+          {
+            "text": "Com muitos anjos em breve Ele voltará",
+            "time": 59,
+            "isSolo": false
+          },
+          {
+            "text": "Me alegrarei ao chegar o grande dia",
+            "time": 64,
+            "isSolo": false
+          },
+          {
+            "text": "E adorarei meu Jesus, que virá pra me buscar!",
+            "time": 69,
+            "isSolo": false
+          },
+          {
+            "text": "Há quanto tempo tens ouvido do amor de meu Jesus?",
+            "time": 86,
+            "isSolo": false
+          },
+          {
+            "text": "Por quanto tempo tens fugido de ouvir a voz da cruz?",
+            "time": 91,
+            "isSolo": false
+          },
+          {
+            "text": "Jesus te chama: 'Vem meu filho, quero dar-te meu perdão'",
+            "time": 96,
+            "isSolo": false
+          },
+          {
+            "text": "'Estou de braços bem abertos, basta abrir seu coração'",
+            "time": 102,
+            "isSolo": false
+          },
+          {
+            "text": "Quero encontrar-te nesse dia",
+            "time": 108,
+            "isSolo": false
+          },
+          {
+            "text": "Quero abraçar-te lá no Céu",
+            "time": 113,
+            "isSolo": false
+          },
+          {
+            "text": "Já ouço os passos de um Deus que se aproxima",
+            "time": 117,
+            "isSolo": false
+          },
+          {
+            "text": "Com muitos anjos em breve Ele voltará",
+            "time": 122,
+            "isSolo": false
+          },
+          {
+            "text": "Me alegrarei ao chegar o grande dia",
+            "time": 128,
+            "isSolo": false
+          },
+          {
+            "text": "E adorarei meu Jesus",
+            "time": 133,
+            "isSolo": false
+          },
+          {
+            "text": "Já ouço os passos de um Deus que se aproxima",
+            "time": 139,
+            "isSolo": false
+          },
+          {
+            "text": "Com muitos anjos em breve Ele voltará",
+            "time": 144,
+            "isSolo": false
+          },
+          {
+            "text": "Me alegrarei ao chegar o grande dia",
+            "time": 149,
+            "isSolo": false
+          },
+          {
+            "text": "E adorarei meu Jesus, que virá pra me buscar!",
+            "time": 155,
+            "isSolo": false
+          },
+          {
+            "text": "Já ouço os passos de um Deus que se aproxima",
+            "time": 166,
+            "isSolo": false
+          },
+          {
+            "text": "Com muitos anjos em breve Ele voltará",
+            "time": 170,
+            "isSolo": false
+          },
+          {
+            "text": "Me alegrarei ao chegar o grande dia",
+            "time": 176,
+            "isSolo": false
+          },
+          {
+            "text": "E adorarei meu Jesus, que virá pra me buscar!",
+            "time": 181,
+            "isSolo": false
+          },
+          {
+            "text": "Virá pra me buscar!",
+            "time": 190,
+            "isSolo": false
+          }
+        ]
+      }
     }
   ]
 }
