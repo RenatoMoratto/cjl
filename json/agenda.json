@@ -147,13 +147,7 @@
     {
       "id": 28,
       "date": "2025-08-22",
-      "title": "Ensaio para a Apresentação",
-      "location": "IASD Central de Londrina - Rua Natal, 42 - Jardim Agari"
-    },
-    {
-      "id": 29,
-      "date": "2025-08-24",
-      "title": "Apresentação",
+      "title": "Ensaio Semanal",
       "location": "IASD Central de Londrina - Rua Natal, 42 - Jardim Agari"
     },
     {
@@ -167,6 +161,12 @@
       "date": "2025-09-05",
       "title": "Ensaio Semanal",
       "location": "IASD Central de Londrina - Rua Natal, 42 - Jardim Agari"
+    },
+    {
+      "id": 234235253,
+      "date": "2025-09-06",
+      "title": "Encontro de Corais",
+      "location": "Faculdade Adventista do Paraná - FAP"
     },
     {
       "id": 32,
