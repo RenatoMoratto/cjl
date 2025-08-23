@@ -39,13 +39,15 @@ export default function Home() {
               Kits de Voz
             </button>
           </Link>
-          {socialMediaLinks.map((socialMedia, index) => (
-            <Link key={index} href={socialMedia.link} target="__blank">
-              <button className="bg-secondary hover:bg-secondary text-white py-2 px-4 w-full md:w-max rounded-full">
-                <socialMedia.icon size={24} />
-              </button>
-            </Link>
-          ))}
+          <div className="flex flex-row justify-center gap-[10px]">
+            {socialMediaLinks.map((socialMedia, index) => (
+              <Link key={index} href={socialMedia.link} target="__blank">
+                <button className="bg-secondary hover:bg-secondary text-white py-2 px-4 w-full md:w-max rounded-full">
+                  <socialMedia.icon size={24} />
+                </button>
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </Layout>
