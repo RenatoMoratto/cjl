@@ -690,6 +690,218 @@
           }
         ]
       }
+    },
+    {
+      "lyrics": {
+        "id": 9,
+        "status": "active",
+        "title": "Eis-Me Aqui",
+        "author": "Coral Jovem Unasp",
+        "musicPath": "/songs/eis-me-aqui",
+        "imageUrl": "/images/logo-fundo.webp",
+        "lines": [
+          {
+            "text": "Insignificante na imensidão",
+            "time": 1,
+            "isSolo": false
+          },
+          {
+            "text": "Tudo que eu sou não vale o pó",
+            "time": 4,
+            "isSolo": false
+          },
+          {
+            "text": "Meus lábios são impuros também",
+            "time": 7,
+            "isSolo": false
+          },
+          {
+            "text": "Meu coração, ai de mim, indigno pecador",
+            "time": 10,
+            "isSolo": false
+          },
+          {
+            "text": "Insignificante na imensidão",
+            "time": 13,
+            "isSolo": false
+          },
+          {
+            "text": "Tudo que eu sou não vale o pó",
+            "time": 16,
+            "isSolo": false
+          },
+          {
+            "text": "Meus lábios são impuros também",
+            "time": 19,
+            "isSolo": false
+          },
+          {
+            "text": "Meu coração, ai de mim, indigno pecador",
+            "time": 22,
+            "isSolo": false
+          },
+          {
+            "text": "Com brasa viva me fez limpo",
+            "time": 25,
+            "isSolo": true
+          },
+          {
+            "text": "Me fez servo e agora eu me entrego",
+            "time": 28,
+            "isSolo": true
+          },
+          {
+            "text": "Vou pra onde Tu quiseres",
+            "time": 31,
+            "isSolo": true
+          },
+          {
+            "text": "Eis-me aqui, eis-me aqui",
+            "time": 34,
+            "isSolo": false
+          },
+          {
+            "text": "Não importa onde for, envia-me",
+            "time": 37,
+            "isSolo": true
+          },
+          {
+            "text": "Eis-me aqui, eis-me aqui",
+            "time": 40,
+            "isSolo": false
+          },
+          {
+            "text": "Quero ecoar pro mundo a Tua voz",
+            "time": 43,
+            "isSolo": true
+          },
+          {
+            "text": "Envia-me, eis-me aqui",
+            "time": 46,
+            "isSolo": true
+          },
+          {
+            "text": "Eis-me aqui, envia-me",
+            "time": 49,
+            "isSolo": true
+          },
+          {
+            "text": "Com brasa viva",
+            "time": 64,
+            "isSolo": true
+          },
+          {
+            "text": "Me fez limpo,  me fez servo",
+            "time": 67,
+            "isSolo": false
+          },
+          {
+            "text": "E agora eu me entrego, vou pra onde Tu quiseres",
+            "time": 70,
+            "isSolo": false
+          },
+          {
+            "text": "Eis-me aqui, eis-me aqui",
+            "time": 73,
+            "isSolo": false
+          },
+          {
+            "text": "Oh, eis-me aqui, eis-me aqui",
+            "time": 76,
+            "isSolo": false
+          },
+          {
+            "text": "Quero ecoar profundo a Tua voz",
+            "time": 79,
+            "isSolo": true
+          },
+          {
+            "text": "Oh, eis-me aqui, eis-me aqui",
+            "time": 82,
+            "isSolo": false
+          },
+          {
+            "text": "Não importa onde for, envia-me",
+            "time": 85,
+            "isSolo": true
+          },
+          {
+            "text": "Eis-me aqui, eis-me aqui",
+            "time": 88,
+            "isSolo": false
+          },
+          {
+            "text": "Eis-me aqui",
+            "time": 91,
+            "isSolo": false
+          },
+          {
+            "text": "Quero ecoar profundo a Tua voz",
+            "time": 97,
+            "isSolo": false
+          },
+          {
+            "text": "Eis-me aqui, eis-me aqui",
+            "time": 100,
+            "isSolo": false
+          },
+          {
+            "text": "Não importa onde for, envia-me",
+            "time": 103,
+            "isSolo": false
+          },
+          {
+            "text": "Eis-me aqui, eis-me aqui",
+            "time": 106,
+            "isSolo": false
+          },
+          {
+            "text": "Eis-me aqui, envia-me",
+            "time": 109,
+            "isSolo": false
+          },
+          {
+            "text": "Eis-me aqui, eis-me aqui",
+            "time": 112,
+            "isSolo": false
+          },
+          {
+            "text": "Quero ecoar pro mundo a Tua voz",
+            "time": 115,
+            "isSolo": false
+          },
+          {
+            "text": "Oh Oh Oh Oh Oh Oh",
+            "time": 118,
+            "isSolo": false
+          },
+          {
+            "text": "Eis-me aqui, eis-me aqui",
+            "time": 121,
+            "isSolo": false
+          },
+          {
+            "text": "Não importa onde for, envia-me",
+            "time": 124,
+            "isSolo": false
+          },
+          {
+            "text": "Eis-me aqui, eis-me aqui",
+            "time": 127,
+            "isSolo": false
+          },
+          {
+            "text": "Quero ecoar pro mundo a Tua voz",
+            "time": 130,
+            "isSolo": false
+          },
+          {
+            "text": "Eis-me aqui, Envia-me",
+            "time": 220,
+            "isSolo": false
+          }
+        ]
+      }
     }
   ]
 }
