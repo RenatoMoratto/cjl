@@ -692,13 +692,13 @@
       }
     },
     {
+      "id": 9,
+      "status": "active",
+      "title": "Eis-Me Aqui",
+      "author": "Coral Jovem Unasp",
+      "musicPath": "/songs/eis-me-aqui",
+      "imageUrl": "/images/logo-fundo.webp",
       "lyrics": {
-        "id": 9,
-        "status": "active",
-        "title": "Eis-Me Aqui",
-        "author": "Coral Jovem Unasp",
-        "musicPath": "/songs/eis-me-aqui",
-        "imageUrl": "/images/logo-fundo.webp",
         "lines": [
           {
             "text": "Insignificante na imensidão",
