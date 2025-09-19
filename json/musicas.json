@@ -721,26 +721,6 @@
             "isSolo": false
           },
           {
-            "text": "Insignificante na imensidão",
-            "time": 13,
-            "isSolo": false
-          },
-          {
-            "text": "Tudo que eu sou não vale o pó",
-            "time": 16,
-            "isSolo": false
-          },
-          {
-            "text": "Meus lábios são impuros também",
-            "time": 19,
-            "isSolo": false
-          },
-          {
-            "text": "Meu coração, ai de mim, indigno pecador",
-            "time": 22,
-            "isSolo": false
-          },
-          {
             "text": "Com brasa viva me fez limpo",
             "time": 25,
             "isSolo": true
@@ -786,12 +766,12 @@
             "isSolo": true
           },
           {
-            "text": "Com brasa viva",
+            "text": "Com brasa viva (homens)",
             "time": 64,
-            "isSolo": true
+            "isSolo": false
           },
           {
-            "text": "Me fez limpo,  me fez servo",
+            "text": "Me fez limpo,  me fez servo (todos)",
             "time": 67,
             "isSolo": false
           },
@@ -806,33 +786,28 @@
             "isSolo": false
           },
           {
-            "text": "Oh, eis-me aqui, eis-me aqui",
+            "text": "Ohhh, eis-me aqui, eis-me aqui",
             "time": 76,
             "isSolo": false
           },
           {
             "text": "Quero ecoar profundo a Tua voz",
             "time": 79,
-            "isSolo": true
+            "isSolo": false
           },
           {
-            "text": "Oh, eis-me aqui, eis-me aqui",
+            "text": "Ohhhhhhh, eis-me aqui, eis-me aqui",
             "time": 82,
             "isSolo": false
           },
           {
             "text": "Não importa onde for, envia-me",
             "time": 85,
-            "isSolo": true
+            "isSolo": false
           },
           {
             "text": "Eis-me aqui, eis-me aqui",
             "time": 88,
-            "isSolo": false
-          },
-          {
-            "text": "Eis-me aqui",
-            "time": 91,
             "isSolo": false
           },
           {
@@ -841,62 +816,32 @@
             "isSolo": false
           },
           {
-            "text": "Eis-me aqui, eis-me aqui",
-            "time": 100,
-            "isSolo": false
-          },
-          {
-            "text": "Não importa onde for, envia-me",
+            "text": "Não importa onde for (homens)",
             "time": 103,
             "isSolo": false
           },
           {
-            "text": "Eis-me aqui, eis-me aqui",
-            "time": 106,
-            "isSolo": false
-          },
-          {
-            "text": "Eis-me aqui, envia-me",
-            "time": 109,
-            "isSolo": false
-          },
-          {
-            "text": "Eis-me aqui, eis-me aqui",
-            "time": 112,
-            "isSolo": false
-          },
-          {
-            "text": "Quero ecoar pro mundo a Tua voz",
+            "text": "Quero ecoar pro mundo a Tua voz (mulheres)",
             "time": 115,
             "isSolo": false
           },
           {
-            "text": "Oh Oh Oh Oh Oh Oh",
-            "time": 118,
-            "isSolo": false
-          },
-          {
-            "text": "Eis-me aqui, eis-me aqui",
+            "text": "Eis-me aqui (homens)",
             "time": 121,
             "isSolo": false
           },
           {
-            "text": "Não importa onde for, envia-me",
-            "time": 124,
-            "isSolo": false
-          },
-          {
-            "text": "Eis-me aqui, eis-me aqui",
+            "text": "Eis-me aqui (todos)",
             "time": 127,
             "isSolo": false
           },
           {
-            "text": "Quero ecoar pro mundo a Tua voz",
+            "text": "Envia-me(homens)",
             "time": 130,
             "isSolo": false
           },
           {
-            "text": "Eis-me aqui, Envia-me",
+            "text": "Eis-me aqui (contraltos)",
             "time": 220,
             "isSolo": false
           }
