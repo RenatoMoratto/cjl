@@ -11,7 +11,14 @@ const nextConfig: NextConfig = {
         pathname: "/vi/**",
       },
     ],
+    formats: ["image/webp", "image/avif"],
   },
+  // Optimize bundle size
+  experimental: {
+    optimizePackageImports: ["@phosphor-icons/react"],
+  },
+  // Enable compression
+  compress: true,
 };
 
 export default nextConfig;
