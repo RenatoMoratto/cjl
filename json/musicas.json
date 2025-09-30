@@ -702,147 +702,162 @@
         "lines": [
           {
             "text": "Insignificante na imensidão",
-            "time": 1,
+            "time": 5,
             "isSolo": false
           },
           {
             "text": "Tudo que eu sou não vale o pó",
-            "time": 4,
+            "time": 11,
             "isSolo": false
           },
           {
-            "text": "Meus lábios são impuros também",
-            "time": 7,
+            "text": "Meus lábios são impuros",
+            "time": 17,
             "isSolo": false
           },
           {
-            "text": "Meu coração, ai de mim, indigno pecador",
-            "time": 10,
+            "text": "Também meu coração",
+            "time": 21,
+            "isSolo": false
+          },
+          {
+            "text": "Ai de mim, indigno pecador",
+            "time": 24,
             "isSolo": false
           },
           {
             "text": "Com brasa viva me fez limpo",
-            "time": 25,
+            "time": 30,
             "isSolo": true
           },
           {
             "text": "Me fez servo e agora eu me entrego",
-            "time": 28,
+            "time": 40,
             "isSolo": true
           },
           {
             "text": "Vou pra onde Tu quiseres",
-            "time": 31,
-            "isSolo": true
-          },
-          {
-            "text": "Eis-me aqui, eis-me aqui",
-            "time": 34,
-            "isSolo": false
-          },
-          {
-            "text": "Não importa onde for, envia-me",
-            "time": 37,
-            "isSolo": true
-          },
-          {
-            "text": "Eis-me aqui, eis-me aqui",
-            "time": 40,
-            "isSolo": false
-          },
-          {
-            "text": "Quero ecoar pro mundo a Tua voz",
-            "time": 43,
-            "isSolo": true
-          },
-          {
-            "text": "Envia-me, eis-me aqui",
-            "time": 46,
-            "isSolo": true
-          },
-          {
-            "text": "Eis-me aqui, envia-me",
             "time": 49,
             "isSolo": true
           },
           {
-            "text": "Com brasa viva (homens)",
-            "time": 64,
-            "isSolo": false
-          },
-          {
-            "text": "Me fez limpo,  me fez servo (todos)",
-            "time": 67,
-            "isSolo": false
-          },
-          {
-            "text": "E agora eu me entrego, vou pra onde Tu quiseres",
-            "time": 70,
-            "isSolo": false
-          },
-          {
             "text": "Eis-me aqui, eis-me aqui",
-            "time": 73,
-            "isSolo": false
-          },
-          {
-            "text": "Ohhh, eis-me aqui, eis-me aqui",
-            "time": 76,
-            "isSolo": false
-          },
-          {
-            "text": "Quero ecoar profundo a Tua voz",
-            "time": 79,
-            "isSolo": false
-          },
-          {
-            "text": "Ohhhhhhh, eis-me aqui, eis-me aqui",
-            "time": 82,
+            "time": 55,
             "isSolo": false
           },
           {
             "text": "Não importa onde for, envia-me",
-            "time": 85,
+            "time": 63,
+            "isSolo": true
+          },
+          {
+            "text": "Eis-me aqui, eis-me aqui",
+            "time": 67,
+            "isSolo": false
+          },
+          {
+            "text": "Quero ecoar pro mundo a Tua voz",
+            "time": 74,
+            "isSolo": true
+          },
+          {
+            "text": "Envia-me, eis-me aqui",
+            "time": 81,
+            "isSolo": true
+          },
+          {
+            "text": "Eis-me aqui, envia-me",
+            "time": 93,
+            "isSolo": true
+          },
+          {
+            "text": "Com brasa viva (homens)",
+            "time": 106,
+            "isSolo": false
+          },
+          {
+            "text": "Me fez limpo, me fez servo (todos)",
+            "time": 112,
+            "isSolo": false
+          },
+          {
+            "text": "E agora eu me entrego,",
+            "time": 120,
+            "isSolo": false
+          },
+          {
+            "text": "vou pra onde Tu quiseres",
+            "time": 124,
             "isSolo": false
           },
           {
             "text": "Eis-me aqui, eis-me aqui",
-            "time": 88,
+            "time": 131,
             "isSolo": false
           },
           {
-            "text": "Quero ecoar profundo a Tua voz",
-            "time": 97,
+            "text": "Ohhh, eis-me aqui, eis-me aqui",
+            "time": 137,
+            "isSolo": false
+          },
+          {
+            "text": "Quero ecoar pro mundo a Tua voz",
+            "time": 151,
+            "isSolo": false
+          },
+          {
+            "text": "Ohhhhhhh",
+            "time": 157,
+            "isSolo": false
+          },
+          {
+            "text": "eis-me aqui, eis-me aqui",
+            "time": 181,
+            "isSolo": false
+          },
+          {
+            "text": "Não importa onde for, envia-me",
+            "time": 188,
+            "isSolo": false
+          },
+          {
+            "text": "Eis-me aqui, eis-me aqui",
+            "time": 194,
+            "isSolo": false
+          },
+          {
+            "text": "Quero ecoar pro mundo a Tua voz",
+            "time": 201,
             "isSolo": false
           },
           {
             "text": "Não importa onde for (homens)",
-            "time": 103,
+            "time": 207,
             "isSolo": false
           },
           {
             "text": "Quero ecoar pro mundo a Tua voz (mulheres)",
-            "time": 115,
+            "time": 211,
             "isSolo": false
           },
           {
             "text": "Eis-me aqui (homens)",
-            "time": 121,
+            "time": 215,
             "isSolo": false
           },
           {
             "text": "Eis-me aqui (todos)",
-            "time": 127,
+            "time": 217,
             "isSolo": false
           },
           {
             "text": "Envia-me(homens)",
-            "time": 130,
+            "time": 223,
             "isSolo": false
           },
           {
             "text": "Eis-me aqui (contraltos)",
-            "time": 220,
+            "time": 227,
             "isSolo": false
           }
         ]
