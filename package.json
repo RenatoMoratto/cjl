@@ -7,11 +7,17 @@
     "build": "next build",
     "start": "next start",
     "lint:check": "prettier --check .",
-    "lint:fix": "prettier --write ."
+    "lint:fix": "prettier --write .",
+    "optimize:audio": "node scripts/optimize-audio.js",
+    "optimize:images": "node scripts/optimize-images.js",
+    "optimize:all": "npm run optimize:images && npm run optimize:audio",
+    "build:optimized": "npm run optimize:all && npm run build"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.7",
     "@vercel/analytics": "^1.5.0",
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "fluent-ffmpeg": "^2.1.2",
     "next": "15.1.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

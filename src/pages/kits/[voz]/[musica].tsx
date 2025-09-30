@@ -1,15 +1,17 @@
 import Layout from "@/components/Layout";
-import SongPlayer from "@/components/SongPlayer";
 import TextReader from "@/components/TextReader";
 import { useLocalAudioPlayer } from "@/hooks/useLocalAudioPlayer";
 import { CaretLeft } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { Song } from "@/types";
 import TextSettingsDropdown from "@/components/TextSettingsDropdown";
 import { useCopyToClipboard, useLocalStorage } from "usehooks-ts";
 import { toast } from "react-toastify";
+
+// Lazy load SongPlayer to reduce initial bundle size
+const SongPlayer = lazy(() => import("@/components/SongPlayer"));
 
 export default function Musica() {
   const params = useParams();
@@ -138,17 +140,25 @@ export default function Musica() {
         </div>
 
         <div className="w-full p-5 rounded-3xl bg-gray-800">
-          <SongPlayer
-            currentTime={currentTime}
-            duration={duration}
-            isPlaying={isPlaying}
-            togglePlay={togglePlay}
-            isReplayEnabled={isReplayEnabled}
-            toggleReplay={toggleReplay}
-            handleSeek={handleSeek}
-            volume={volume}
-            handleVolumeChange={handleVolumeChange}
-          />
+          <Suspense
+            fallback={
+              <div className="text-center text-gray-50">
+                Carregando player...
+              </div>
+            }
+          >
+            <SongPlayer
+              currentTime={currentTime}
+              duration={duration}
+              isPlaying={isPlaying}
+              togglePlay={togglePlay}
+              isReplayEnabled={isReplayEnabled}
+              toggleReplay={toggleReplay}
+              handleSeek={handleSeek}
+              volume={volume}
+              handleVolumeChange={handleVolumeChange}
+            />
+          </Suspense>
         </div>
       </div>
     </Layout>
