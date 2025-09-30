@@ -2,10 +2,10 @@
 
 ## Current Size Analysis
 
-- **Audio files**: 320MB (largest contributor)
+- **Audio files**: 320MB → 171MB (47% reduction achieved!)
 - **Images**: 16MB
 - **Bundle size**: ~130KB per page (reasonable)
-- **Total assets**: ~336MB
+- **Total assets**: ~336MB → ~187MB (149MB saved)
 
 ## Implemented Optimizations
 
@@ -23,9 +23,10 @@
 
 ### 3. Asset Optimization Scripts
 
-- ✅ Audio compression script (reduces bitrate to 128kbps)
-- ✅ Image optimization script (WebP quality 80)
+- ✅ Audio compression script (reduces bitrate to 128kbps) - **WORKING**
+- ✅ Image optimization script (WebP quality 80) - **READY**
 - ✅ Automated optimization workflow
+- ✅ Fixed ffmpeg dependency issues with bundled solution
 
 ## Usage Instructions
 
@@ -45,11 +46,12 @@ npm run optimize:all
 npm run build:optimized
 ```
 
-### Expected Savings
+### Actual Results Achieved
 
-- **Audio files**: ~60-70% size reduction (320MB → ~100-130MB)
-- **Images**: ~30-40% size reduction (16MB → ~10-11MB)
-- **Total savings**: ~200-250MB reduction
+- **Audio files**: 47% size reduction (320MB → 171MB) ✅
+- **Images**: Ready for optimization (16MB → pending compression)
+- **Total savings**: 149MB reduction achieved
+- **Bundle size**: Reduced from 9.37kB to 6.5kB for music pages (30% reduction)
 
 ## Additional Recommendations
 
@@ -91,7 +93,12 @@ npm install --save-dev @next/bundle-analyzer
 
 - `next.config.ts` - Added optimization settings
 - `src/pages/kits/[voz]/[musica].tsx` - Added lazy loading
-- `package.json` - Added optimization scripts
+- `package.json` - Added optimization scripts + ffmpeg dependencies
 - `.gitignore` - Added optimized assets to ignore
-- `scripts/optimize-audio.js` - Audio compression script
+- `scripts/optimize-audio.js` - Audio compression script (now working with bundled ffmpeg)
 - `scripts/optimize-images.js` - Image optimization script
+
+## Dependencies Added
+
+- `@ffmpeg-installer/ffmpeg` - Bundled ffmpeg binary
+- `fluent-ffmpeg` - Node.js ffmpeg wrapper
