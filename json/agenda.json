@@ -209,6 +209,54 @@
       "date": "2025-10-17",
       "title": "Ensaio Semanal",
       "location": "IASD Central de Londrina - Rua Natal, 42 - Jardim Agari"
+    },
+    {
+      "id": 39,
+      "date": "2025-10-25",
+      "title": "Apresentação na Central",
+      "location": "IASD Central de Londrina - Rua Natal, 42 - Jardim Agari"
+    },
+    {
+      "id": 40,
+      "date": "2025-10-26",
+      "title": "Apresentação no Roma",
+      "location": "Rua Aparecido Antonio da Silva, 111"
+    },
+    {
+      "id": 41,
+      "date": "2025-11-01",
+      "title": "Viagem (Culto + Apresentação)",
+      "location": "Telêmaco Borba"
+    },
+    {
+      "id": 42,
+      "date": "2025-11-02",
+      "title": "Viagem (Cânion Guartelá)",
+      "location": "Telêmaco Borba"
+    },
+    {
+      "id": 43,
+      "date": "2025-11-29",
+      "title": "Apresentação",
+      "location": "IASD Central de Londrina - Rua Natal, 42 - Jardim Agari"
+    },
+    {
+      "id": 44,
+      "date": "2025-11-30",
+      "title": "Apresentação de Final de Ano",
+      "location": "IASD Central de Londrina - Rua Natal, 42 - Jardim Agari"
+    },
+    {
+      "id": 45,
+      "date": "2025-12-06",
+      "title": "Celebração Jovem às 17hrs",
+      "location": "Concha acústica de Londrina"
+    },
+    {
+      "id": 46,
+      "date": "2025-12-14",
+      "title": "Apresentação de Natal",
+      "location": "IASD Central de Londrina - Rua Natal, 42 - Jardim Agari"
     }
   ]
 }
