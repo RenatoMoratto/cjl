@@ -862,6 +862,87 @@
           }
         ]
       }
+    },
+    {
+      "id": 10,
+      "status": "active",
+      "title": "Canção do Apocalipse",
+      "author": "Nova Semente",
+      "musicPath": "/songs/cancao-do-apocalipse",
+      "imageUrl": "/images/logo-fundo.webp",
+      "lyrics": {
+        "lines": [
+          { "text": "Digno é o Cordeiro", "time": 30 },
+          { "text": "Que foi morto", "time": 34 },
+          { "text": "Santo, santo Ele é", "time": 37 },
+          { "text": "Um novo cantico", "time": 45 },
+          { "text": "Ao que se assenta", "time": 48 },
+          { "text": "Sobre o trono dos céus", "time": 55 },
+
+          { "text": "Digno é o Cordeiro", "time": 60 },
+          { "text": "Que foi morto", "time": 63 },
+          { "text": "Santo, santo Ele é", "time": 67 },
+          { "text": "Um novo cantico", "time": 74 },
+          { "text": "Ao que se assenta", "time": 77 },
+          { "text": "Sobre o trono dos céus", "time": 82 },
+
+          { "text": "Santo, santo, santo", "time": 90 },
+          { "text": "Deus todo poderoso", "time": 92 },
+          { "text": "Que era, é e há de vir", "time": 95 },
+
+          { "text": "Com a criação eu canto", "time": 103 },
+          { "text": "Louvores ao Rei dos reis", "time": 105 },
+          { "text": "És tudo para mim", "time": 110 },
+          { "text": "E eu te adorarei", "time": 113 },
+
+          { "text": "Maravilhado, extasiado", "time": 132 },
+          { "text": "Eu fico ao ouvir teu nome", "time": 140 },
+          { "text": "Jesus, teu nome é força", "time": 145 },
+          { "text": "É folego de vida", "time": 151 },
+          { "text": "Misteriosa água viva", "time": 155 },
+
+          { "text": "Santo, santo, santo", "time": 163 },
+          { "text": "Deus todo poderoso", "time": 166 },
+          { "text": "Que era, é e há de vir", "time": 168 },
+
+          { "text": "Com a criação eu canto", "time": 176 },
+          { "text": "Louvores ao Rei dos reis", "time": 179 },
+          { "text": "És tudo para mim", "time": 182 },
+          { "text": "E eu te adorarei", "time": 185 },
+
+          { "text": "Maravilhado, extasiado", "time": 205 },
+          { "text": "Eu fico ao ouvir teu nome", "time": 213 },
+
+          { "text": "Maravilhado, extasiado", "time": 220 },
+          { "text": "Eu fico ao ouvir teu nome", "time": 223 },
+
+          { "text": "Jesus, teu nome é força", "time": 233 },
+          { "text": "É folego de vida", "time": 237 },
+          { "text": "Misteriosa água viva", "time": 241 },
+
+          { "text": "Santo, santo, santo", "time": 250 },
+          { "text": "Deus todo poderoso", "time": 252 },
+          { "text": "Que era, é e há de vir", "time": 255 },
+
+          { "text": "Com a criação eu canto", "time": 263 },
+          { "text": "Louvores ao Rei dos reis", "time": 266 },
+          { "text": "És tudo para mim", "time": 270 },
+          { "text": "E eu te adorarei", "time": 273 },
+
+          { "text": "Santo, santo, santo", "time": 278 },
+          { "text": "Deus todo poderoso", "time": 280 },
+          { "text": "Que era, é e há de vir", "time": 284 },
+
+          { "text": "Com a criação eu canto", "time": 292 },
+          { "text": "Louvores ao Rei dos reis", "time": 296 },
+          { "text": "És tudo para mim", "time": 299 },
+          { "text": "E eu te adorarei", "time": 302 },
+
+          { "text": "Digno é o Cordeiro", "time": 321 },
+          { "text": "Que foi morto", "time": 325 },
+          { "text": "Santo, santo Ele é", "time": 329 }
+        ]
+      }
     }
   ]
 }
