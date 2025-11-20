@@ -44,8 +44,8 @@ export default function Songs() {
   return (
     <Layout submenu title={`Músicas ${formattedVoice} | CJL`}>
       <div className="h-full w-full content-center">
-        <div className="h-full w-full p-5 flex flex-col gap-4 rounded-3xl bg-gray-800">
-          <div className="w-full grid place-items-center">
+        <div className="h-full w-full p-5 flex flex-col rounded-3xl bg-gray-800">
+          <div className="w-full grid place-items-center mb-4">
             <div className="w-full flex items-center justify-between">
               <Link href="/kits">
                 <CaretLeft size={32} weight="bold" />
@@ -57,7 +57,7 @@ export default function Songs() {
             </div>
             <h3 className="text-xl text-gray-100">{formattedVoice}</h3>
           </div>
-          <div className="h-full w-full flex flex-col gap-3">
+          <div className="w-full flex flex-col gap-3 overflow-y-auto">
             {loading && <p className="text-gray-50">Carregando...</p>}
 
             {!loading &&
