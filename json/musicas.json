@@ -943,6 +943,58 @@
           { "text": "Santo, santo Ele é", "time": 329 }
         ]
       }
+    },
+    {
+      "id": 11,
+      "status": "active",
+      "title": "Glorioso",
+      "author": "Margem Norte",
+      "musicPath": "/songs/glorioso",
+      "imageUrl": "/images/logo-fundo.webp",
+      "lyrics": {
+        "lines": [
+          { "text": "O trono vazio", "time": 16 },
+          { "text": "O céu em silêncio", "time": 20 },
+          { "text": "Em reverência", "time": 25 },
+          { "text": "Contemplam o Rei", "time": 29 },
+          { "text": "Que nasce entre os homens", "time": 33 },
+          { "text": "Profundo mistério", "time": 37 },
+          { "text": "Do Amor infinito", "time": 42 },
+          { "text": "De um Deus criador", "time": 46 },
+
+          { "text": "Graça divina", "time": 50 },
+          { "text": "Inexplicável", "time": 55 },
+          { "text": "Na manjedoura", "time": 60 },
+          { "text": "O menino está", "time": 64 },
+          { "text": "Deixou sua glória", "time": 67 },
+          { "text": "E majestade", "time": 72 },
+          { "text": "Deixou sua coroa", "time": 76 },
+          { "text": "Pra nascer entre nós", "time": 80 },
+
+          { "text": "Aleluia! Aleluia! Aleluia!", "time": 90 },
+
+          { "text": "Rei da Glória", "time": 107 },
+          { "text": "Rei da paz", "time": 112 },
+          { "text": "Glorioso", "time": 116 },
+          { "text": "Filho de Deus", "time": 120 },
+          { "text": "Cantam os anjos", "time": 124 },
+          { "text": "No céu de Belém", "time": 128 },
+          { "text": "Glórias a Cristo", "time": 133 },
+          { "text": "Aleluia! Aleluia!", "time": 137 },
+
+          { "text": "Ajoelhai", "isSolo": true, "time": 147 },
+          { "text": "Ouvi a voz dos anjos", "isSolo": true, "time": 155 },
+          { "text": "Natal, natal!", "isSolo": true, "time": 164 },
+          { "text": "Nasceu o Rei dos reis", "isSolo": true, "time": 172 },
+          { "text": "Natal, natal!", "isSolo": true, "time": 181 },
+          { "text": "Nasceu o Redentor", "isSolo": true, "time": 194 },
+
+          { "text": "Cantam os anjos", "time": 202 },
+          { "text": "No céu de Belém", "time": 206 },
+          { "text": "Glórias a Cristo", "time": 211 },
+          { "text": "Aleluia! Aleluia! Aleluia!", "time": 215 }
+        ]
+      }
     }
   ]
 }
