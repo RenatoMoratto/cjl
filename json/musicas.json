@@ -995,6 +995,51 @@
           { "text": "Aleluia! Aleluia! Aleluia!", "time": 215 }
         ]
       }
+    },
+    {
+      "id": 12,
+      "status": "active",
+      "title": "Natal, Feliz Natal",
+      "author": "",
+      "musicPath": "/songs/natal-feliz-natal",
+      "imageUrl": "/images/logo-fundo.webp",
+      "lyrics": {
+        "lines": [
+          { "text": "MULHERES", "time": 999 },
+          { "text": "Natal, feliz Natal! No céu de Belém", "time": 999 },
+          { "text": "Uma luz que surgiu fez vibrar, lá no além", "time": 999 },
+          { "text": "A voz de querubins em sons divinais", "time": 999 },
+          { "text": "Que do Céu proclamou salvação aos mortais", "time": 999 },
+
+          { "text": "TODOS", "time": 999 },
+          { "text": "Natal, feliz Natal!", "time": 999 },
+          { "text": "Natal, Natal!", "time": 999 },
+          { "text": "Eis que nasceu", "time": 999 },
+          { "text": "Nosso Rei divinal!", "time": 999 },
+
+          { "text": "HOMENS", "time": 999 },
+          { "text": "A paz então reinou em, céu, terra e mar", "time": 999 },
+          { "text": "Ao descer sobre o Rei uma luz tutelar", "time": 999 },
+          { "text": "A luz do Salvador brilhou mais e mais", "time": 999 },
+          { "text": "E guiou a Seus pés nobres reis orientais", "time": 999 },
+
+          { "text": "TODOS", "time": 999 },
+          { "text": "Natal, feliz Natal!", "time": 999 },
+          { "text": "Natal, Natal!", "time": 999 },
+          { "text": "Eis que nasceu", "time": 999 },
+          { "text": "Nosso Rei divinal!", "time": 999 },
+
+          { "text": "A luz que fez reinar a paz divinal", "time": 999 },
+          { "text": "Que encheu todo o céu de fulgor sideral", "time": 999 },
+          { "text": "A luz que ainda está no céu a luzir", "time": 999 },
+          { "text": "Vem também nossos pés a Jesus conduzir", "time": 999 },
+
+          { "text": "Natal, feliz Natal!", "time": 999 },
+          { "text": "Natal, Natal!", "time": 999 },
+          { "text": "Eis que nasceu", "time": 999 },
+          { "text": "Nosso Rei divinal!", "time": 999 }
+        ]
+      }
     }
   ]
 }
