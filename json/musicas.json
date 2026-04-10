@@ -1733,6 +1733,127 @@
           }
         ]
       }
+    },
+    {
+      "id": 14,
+      "status": "active",
+      "title": "Flui Em Nós",
+      "author": "Coral Jovem do Unasp",
+      "musicPath": "/songs/flui-em-nos",
+      "imageUrl": "/images/logo-fundo.webp",
+      "lyrics": {
+        "lines": [
+          {
+            "text": "♪",
+            "time": 0,
+            "isSolo": false
+          },
+
+          { "text": "HOMENS", "time": 24 },
+          { "text": "Nessa terra seca e vazia", "time": 24 },
+          { "text": "Precisamos de Tua mão", "time": 28 },
+          { "text": "Sejas Tu a nossa alegria", "time": 32 },
+          { "text": "E conforto ao coração", "time": 36 },
+
+          { "text": "MULHERES", "time": 40 },
+          { "text": "Que Tua palavra seja lida", "time": 40 },
+          { "text": "E vivida, então, por nós", "time": 44 },
+          { "text": "Que nossos ouvidos só atendam", "time": 48 },
+          { "text": "Tão somente à Tua voz", "time": 52 },
+
+          { "text": "TODOS", "time": 56 },
+          { "text": "Flui em nós, Senhor", "time": 56 },
+          { "text": "Tudo para o Teu louvor", "time": 62 },
+          { "text": "Flui em nós, Senhor", "time": 64 },
+          { "text": "Que habite em nós o Teu amor", "time": 69 },
+
+          { "text": "MULHERES", "time": 72 },
+          { "text": "Ôôôôh, ôôôôôh", "time": 72 },
+          { "text": "TODOS", "time": 79 },
+          { "text": "Ôôôôh, ôôôôôh", "time": 79 },
+
+          { "text": "MULHERES", "time": 88 },
+          { "text": "Em cada detalhe dessa vida", "time": 88 },
+          { "text": "Precisamos depender", "time": 92 },
+
+          { "text": "HOMENS", "time": 96 },
+          { "text": "De Tua vontade e Tua guia", "time": 96 },
+          { "text": "Conduzindo o viver", "time": 100 },
+
+          { "text": "TODOS", "time": 104 },
+          { "text": "Que o Teu Espírito habite", "time": 104 },
+          { "text": "Ricamente em cada um", "time": 108 },
+          { "text": "Flua na direita e na esquerda", "time": 112 },
+          { "text": "Esteja em nós de norte a sul", "time": 116 },
+
+          { "text": "Flui em nós, Senhor", "time": 120 },
+          { "text": "Tudo para o Teu louvor", "time": 125 },
+          { "text": "Flui em nós, Senhor", "time": 128 },
+          { "text": "Que habite em nós o Teu amor", "time": 132 },
+
+          { "text": "MULHERES", "time": 137 },
+          { "text": "Pelo Teu querer", "time": 137 },
+
+          { "text": "HOMENS", "time": 139 },
+          { "text": "Flui em nós", "time": 139 },
+
+          { "text": "MULHERES", "time": 141 },
+          { "text": "Pelo Teu poder", "time": 141 },
+
+          { "text": "HOMENS", "time": 144 },
+          { "text": "Flui em nós", "time": 144 },
+
+          { "text": "MULHERES", "time": 145 },
+          { "text": "Teu é nosso ser", "time": 145 },
+
+          { "text": "TODOS", "time": 147 },
+          { "text": "Flui em nós", "time": 147 },
+
+          { "text": "Pai, nos enche de amor e graça", "time": 149 },
+          { "text": "Flui em nós", "time": 152 },
+
+          { "text": "HOMENS", "time": 153 },
+          { "text": "Pelo Teu querer", "time": 153 },
+
+          { "text": "MULHERES", "time": 156 },
+          { "text": "Flui em nós", "time": 156 },
+
+          { "text": "HOMENS", "time": 157 },
+          { "text": "Pelo Teu poder", "time": 157 },
+
+          { "text": "MULHERES", "time": 159 },
+          { "text": "Flui em nós", "time": 159 },
+
+          { "text": "HOMENS", "time": 161 },
+          { "text": "Teu é nosso ser", "time": 161 },
+
+          { "text": "MULHERES", "time": 164 },
+          { "text": "Flui em nós", "time": 164 },
+
+          { "text": "TODOS", "time": 165 },
+          { "text": "Pai, nos enche de amor e graça", "time": 165 },
+          { "text": "Flui em nós", "time": 167 },
+
+          { "text": "Pai, nos enche de amor e graça", "time": 169 },
+          { "text": "Flui em nós", "time": 171 },
+
+          { "text": "Flui em nós, Senhor", "time": 173 },
+          { "text": "Tudo para o Teu louvor", "time": 177 },
+          { "text": "Flui em nós, Senhor", "time": 180 },
+          { "text": "Que habite em nós o Teu amor", "time": 184 },
+          { "text": "Flui em nós, Senhor", "time": 189 },
+          { "text": "Tudo para o Teu louvor", "time": 194 },
+          { "text": "Flui em nós, Senhor", "time": 197 },
+          { "text": "Que habite em nós o Teu amor", "time": 201 },
+
+          { "text": "MULHERES", "time": 204 },
+          { "text": "Ôôôôh, ôôôôôh", "time": 204 },
+
+          { "text": "TODOS", "time": 211 },
+          { "text": "Ôôôôh, ôôôôôh", "time": 211 },
+          { "text": "Ôôôôh, ôôôôôh", "time": 220 }
+        ]
+      }
     }
   ]
 }
