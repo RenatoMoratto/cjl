@@ -1854,6 +1854,106 @@
           { "text": "Ôôôôh, ôôôôôh", "time": 220 }
         ]
       }
+    },
+ {
+      "id": 15,
+      "status": "active",
+      "title": "Santo Pra Sempre",
+      "author": "Coral Jovem do Unasp",
+      "musicPath": "/songs/santo-pra-sempre",
+      "imageUrl": "/images/logo-fundo.webp",
+      "lyrics": {
+        "lines": [
+          {
+            "text": "♪",
+            "time": 0,
+            "isSolo": false
+          },
+
+          { "text": "As muitas gerações", "time": 14 },
+          { "text": "rendidas em louvor", "time": 18 },
+
+          { "text": "Cantando ao cordeiro", "time": 21 },
+          { "text": "uma canção", "time": 23 },
+
+          { "text": "Os que em Ti se foram", "time": 27 },
+          { "text": "e os que hão de crer", "time": 31 },
+
+          { "text": "Cantando ao cordeiro", "time": 34 },
+          { "text": "uma canção", "time": 36 },
+
+          { "text": "Teu nome é o mais alto", "time": 40 },
+          { "text": "Teu nome é o maior ", "time": 43 },
+          { "text": "Teu nome é sobre todos", "time": 46 },
+
+          { "text": "Os tronos e domínios,", "time": 53 },
+          { "text": "governos e poderes", "time": 56 },
+          { "text": "Teu nome é sobre todos", "time": 60 },
+
+          { "text": "E os anjos clamam, santo,", "time": 65 },
+          { "text": "toda criação, santo", "time": 71 },
+
+          { "text": "Exaltado és, santo,", "time": 78 },
+          { "text": "santo pra sempre", "time": 84 },
+
+          { "text": "Quem foi perdoado", "time": 92 },
+          { "text": "e redimido foi ", "time": 96 },
+
+          { "text": "Cante ao cordeiro", "time": 100 },
+          { "text": "uma canção", "time": 102 },
+
+          { "text": "Aquele que é livre,", "time": 105 },
+          { "text": "e leva o seu nome ", "time": 109 },
+
+          { "text": "Cante ao cordeiro", "time": 112 },
+          { "text": "uma canção", "time": 115 },
+          { "text": "Cantaremos para sempre,", "time": 118 },
+          { "text": "amém!", "time": 121 },
+
+          { "text": "E os anjos clamam, santo,", "time": 123 },
+          { "text": "toda criação, santo", "time": 129 },
+
+          { "text": "Exaltado és, santo,", "time": 135 },
+          { "text": "santo pra sempre", "time": 142 },
+
+          { "text": "Teu povo a cantar, santo", "time": 148 },
+          { "text": "Sim, ao Rei dos reis, santo", "time": 153 },
+
+          { "text": "Tu sempre serás santo,", "time": 162 },
+          { "text": "santo pra sempre", "time": 168 },
+
+          { "text": "Teu nome é o mais alto ", "time": 176 },
+          { "text": "Teu nome é o maior", "time": 180 },
+          { "text": "Teu nome é sobre todos", "time": 183 },
+
+          { "text": "Os tronos e domínios,", "time": 189 },
+          { "text": "governos e poderes", "time": 193 },
+          { "text": "Teu nome é sobre todos", "time": 196 },
+
+          { "text": "Cristo, Teu nome é o mais alto", "time": 201 },
+          { "text": "Teu nome é o maior ", "time": 205 },
+          { "text": "Teu nome é sobre todos", "time": 208 },
+
+          { "text": "Os tronos e domínios,", "time": 215 },
+          { "text": "governos e poderes, ", "time": 218 },
+          { "text": "Teu nome é sobre todos", "time": 221 },
+
+          { "text": "E os anjos clamam, santo,", "time": 230 },
+          { "text": "toda criação, santo", "time": 236 },
+
+          { "text": "Exaltado és, santo,", "time": 243 },
+          { "text": "santo pra sempre", "time": 249 },
+
+          { "text": "Teu povo a cantar, santo,", "time": 255 },
+          { "text": "sim, ao Rei dos reis, santo", "time": 262 },
+
+          { "text": "Tu sempre serás santo,", "time": 269 },
+          { "text": "santo pra sempre", "time": 276 },
+
+          { "text": "Tu sempre serás santo,", "time": 282 },
+          { "text": "santo pra sempre!", "time": 289 }
+        ]
+      }
     }
   ]
 }
