@@ -1855,7 +1855,7 @@
         ]
       }
     },
- {
+    {
       "id": 15,
       "status": "active",
       "title": "Santo Pra Sempre",
@@ -1952,6 +1952,117 @@
 
           { "text": "Tu sempre serás santo,", "time": 282 },
           { "text": "santo pra sempre!", "time": 289 }
+        ]
+      }
+    },
+    {
+      "id": 16,
+      "status": "active",
+      "title": "Ouve Meu Coração",
+      "author": "Coral Jovem do Unasp",
+      "musicPath": "/songs/ouve-meu-coracao",
+      "imageUrl": "/images/logo-fundo.webp",
+      "lyrics": {
+        "lines": [
+          {
+            "text": "Sincronização da letra não finalizada",
+            "time": 0,
+            "isSolo": true
+          },
+          {
+            "text": "♪",
+            "time": 0,
+            "isSolo": false
+          },
+
+          {
+            "text": "Que tenho de bom",
+            "time": 42,
+            "isSolo": true
+          },
+          { "text": "Pra que te lembres de mim", "time": 47, "isSolo": true },
+          { "text": "Que posso fazer", "time": 58, "isSolo": true },
+          { "text": "Pra que tu olhes pra mim", "time": 62, "isSolo": true },
+          {
+            "text": "Sou tão pequeno e entre tantos",
+            "time": 70,
+            "isSolo": true
+          },
+          { "text": "Como podes perceber", "time": 75, "isSolo": true },
+          {
+            "text": "As coisas que estou sentindo",
+            "time": 77,
+            "isSolo": true
+          },
+          {
+            "text": "Eu sei, tua palavra diz pra mim",
+            "time": 85,
+            "isSolo": true
+          },
+          { "text": "Que para ti tenho valor", "time": 90, "isSolo": true },
+          { "text": "E que tu podes escutar", "time": 93, "isSolo": true },
+          { "text": "A minha oração", "time": 100, "isSolo": true },
+          {
+            "text": "Eu sei, não vês o meu exterior",
+            "time": 100,
+            "isSolo": true
+          },
+          { "text": "Mas o que há dentro de mim", "time": 100, "isSolo": true },
+          { "text": "E mesmo em meio a multidão", "time": 100, "isSolo": true },
+          { "text": "Estamos os dois a sós", "time": 100, "isSolo": true },
+          { "text": "Enquanto louvo", "time": 100, "isSolo": true },
+          { "text": "Uh...", "time": 100 },
+          { "text": "Enquanto louvo", "time": 100, "isSolo": true },
+          { "text": "Uh...", "time": 100 },
+          { "text": "posso ó Deus sentir", "time": 100, "isSolo": true },
+          { "text": "O teu amor em mim", "time": 100, "isSolo": true },
+          {
+            "text": "Estás no mundo inteiro, mas",
+            "time": 100,
+            "isSolo": true
+          },
+          { "text": "Uh...", "time": 100 },
+          { "text": "eu sei que tu estás aqui", "time": 100, "isSolo": true },
+          { "text": "Te adorar é minha intenção", "time": 100, "isSolo": true },
+          {
+            "text": "Quando eu cantar ouve meu coração",
+            "time": 100,
+            "isSolo": true
+          },
+          { "text": "Uh...", "time": 100 },
+          { "text": "Não sei te alcançar", "time": 100 },
+          { "text": "mas tu me elevas a ti", "time": 100 },
+          { "text": "Eu não sei orar", "time": 100 },
+          { "text": "mas me entendes assim", "time": 100 },
+          { "text": "Há outras vozes mais bonitas", "time": 100 },
+          { "text": "Mas tu amas escutar", "time": 100 },
+          { "text": "a minha em meio a tantas", "time": 100 },
+          { "text": "Eu sei,", "time": 100 },
+          { "text": "tua palavra diz pra mim", "time": 100 },
+          { "text": "Que para ti tenho valor", "time": 100 },
+          { "text": "E que tu podes escutar", "time": 100 },
+          { "text": "A minha oração", "time": 100 },
+          { "text": "Eu sei,", "time": 100 },
+          { "text": "não vês o meu exterior", "time": 100 },
+          { "text": "Mas o que há dentro de mim", "time": 100 },
+          { "text": "E mesmo em meio a multidão", "time": 100 },
+          { "text": "Estamos os dois a sós", "time": 100 },
+          { "text": "Enquanto louvo posso ó Deus sentir", "time": 100 },
+          { "text": "O teu amor em mim", "time": 100 },
+          { "text": "Estás no mundo inteiro", "time": 100 },
+          { "text": "mas eu sei", "time": 100 },
+          { "text": "que tu estás aqui", "time": 100 },
+          { "text": "Te adorar", "time": 100 },
+          { "text": "é minha intenção", "time": 100 },
+          { "text": "Quando eu cantar", "time": 100 },
+          { "text": "ouve meu coração", "time": 100 },
+          { "text": "Enquanto louvo posso ó Deus sentir", "time": 100 },
+          { "text": "O teu amor em mim", "time": 100 },
+          { "text": "Estás no mundo inteiro", "time": 100 },
+          { "text": "Mas eu sei que tu estás aqui", "time": 100 },
+          { "text": "Te adorar é minha intenção", "time": 100 },
+          { "text": "Quando eu cantar", "time": 100 },
+          { "text": "ouve o meu coração", "time": 100 }
         ]
       }
     }
