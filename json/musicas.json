@@ -2062,6 +2062,473 @@
           { "text": "ouve o meu coração", "time": 284 }
         ]
       }
+    },
+    {
+      "id": 17,
+      "status": "active",
+      "title": "Amados",
+      "author": "Grande Coro da FAP",
+      "musicPath": "/songs/amados",
+      "imageUrl": "/images/logo-fundo.webp",
+      "lyrics": {
+        "lines": [
+          {
+            "text": "♪",
+            "time": 0,
+            "isSolo": false
+          },
+          {
+            "text": "HOMENS",
+            "time": 84,
+            "isSolo": true
+          },
+          {
+            "text": "Só um amor",
+            "time": 84,
+            "isSolo": false
+          },
+          {
+            "text": "grandioso em poder,",
+            "time": 87,
+            "isSolo": false
+          },
+          {
+            "text": "que não muda, não falha,",
+            "time": 89,
+            "isSolo": false
+          },
+          {
+            "text": "poderá nos suster.",
+            "time": 92,
+            "isSolo": false
+          },
+          {
+            "text": "Quem me escolheu",
+            "time": 96,
+            "isSolo": false
+          },
+          {
+            "text": "concedeu-me perdão,",
+            "time": 98,
+            "isSolo": false
+          },
+          {
+            "text": "me aceitou como filho",
+            "time": 101,
+            "isSolo": false
+          },
+          {
+            "text": "e proveu redenção.",
+            "time": 105,
+            "isSolo": false
+          },
+          {
+            "text": "MULHERES",
+            "time": 108,
+            "isSolo": true
+          },
+          {
+            "text": "Foi o Seu cuidado eterno",
+            "time": 108,
+            "isSolo": false
+          },
+          {
+            "text": "que me trouxe pra mais perto",
+            "time": 110,
+            "isSolo": false
+          },
+          {
+            "text": "desse amor,",
+            "time": 114,
+            "isSolo": false
+          },
+          {
+            "text": "Seu amor!",
+            "time": 117,
+            "isSolo": false
+          },
+          {
+            "text": "Nem a vida, nem a morte,",
+            "time": 120,
+            "isSolo": false
+          },
+          {
+            "text": "nem o tempo com sua sorte",
+            "time": 123,
+            "isSolo": false
+          },
+          {
+            "text": "vai romper",
+            "time": 126,
+            "isSolo": false
+          },
+          {
+            "text": "o Seu grande amor!",
+            "time": 128,
+            "isSolo": false
+          },
+          {
+            "text": "TODOS",
+            "time": 132,
+            "isSolo": true
+          },
+          {
+            "text": "Só um amor grandioso em poder,",
+            "time": 132,
+            "isSolo": false
+          },
+          {
+            "text": "que não muda, não falha,",
+            "time": 138,
+            "isSolo": false
+          },
+          {
+            "text": "poderá nos suster.",
+            "time": 140,
+            "isSolo": false
+          },
+          {
+            "text": "Quem me escolheu",
+            "time": 144,
+            "isSolo": false
+          },
+          {
+            "text": "concedeu-me o perdão;",
+            "time": 147,
+            "isSolo": false
+          },
+          {
+            "text": "me aceitou como filho",
+            "time": 149,
+            "isSolo": false
+          },
+          {
+            "text": "e proveu redenção.",
+            "time": 153,
+            "isSolo": false
+          },
+          {
+            "text": "Eu sei que",
+            "time": 155,
+            "isSolo": false
+          },
+          {
+            "text": "Deus é por nós,",
+            "time": 157,
+            "isSolo": false
+          },
+          {
+            "text": "deu sua vida!",
+            "time": 159,
+            "isSolo": false
+          },
+          {
+            "text": "pelo Seu sangue",
+            "time": 163,
+            "isSolo": false
+          },
+          {
+            "text": "nos libertou.",
+            "time": 166,
+            "isSolo": false
+          },
+          {
+            "text": "Deus nos amou,",
+            "time": 170,
+            "isSolo": false
+          },
+          {
+            "text": "deu-nos Seu Filho;",
+            "time": 174,
+            "isSolo": false
+          },
+          {
+            "text": "por Sua Graça",
+            "time": 176,
+            "isSolo": false
+          },
+          {
+            "text": "agora livre eu sou!",
+            "time": 179,
+            "isSolo": false
+          },
+          {
+            "text": "Não há amor",
+            "time": 184,
+            "isSolo": false
+          },
+          {
+            "text": "maior",
+            "time": 187,
+            "isSolo": false
+          },
+          {
+            "text": "que dar o Filho pra morrer!",
+            "time": 191,
+            "isSolo": false
+          },
+          {
+            "text": "MULHERES",
+            "time": 200,
+            "isSolo": true
+          },
+          {
+            "text": "Uh...",
+            "time": 200,
+            "isSolo": false
+          },
+          {
+            "text": "HOMENS",
+            "time": 202,
+            "isSolo": true
+          },
+          {
+            "text": "Ele se entregou,",
+            "time": 202,
+            "isSolo": false
+          },
+          {
+            "text": "se fez réu",
+            "time": 203,
+            "isSolo": false
+          },
+          {
+            "text": "e protagonizou",
+            "time": 205,
+            "isSolo": false
+          },
+          {
+            "text": "TODOS",
+            "time": 208,
+            "isSolo": true
+          },
+          {
+            "text": "as cenas do mais",
+            "time": 208,
+            "isSolo": false
+          },
+          {
+            "text": "puro amor!",
+            "time": 210,
+            "isSolo": false
+          },
+          {
+            "text": "Cenas do amor!",
+            "time": 214,
+            "isSolo": false
+          },
+          {
+            "text": "MULHERES",
+            "time": 224,
+            "isSolo": true
+          },
+          {
+            "text": "Sim!",
+            "time": 224,
+            "isSolo": false
+          },
+          {
+            "text": "Cristo me ama!",
+            "time": 225,
+            "isSolo": false
+          },
+          {
+            "text": "Sim!",
+            "time": 228,
+            "isSolo": false
+          },
+          {
+            "text": "Cristo me ama!",
+            "time": 230,
+            "isSolo": false
+          },
+          {
+            "text": "Sim!",
+            "time": 234,
+            "isSolo": false
+          },
+          {
+            "text": "Cristo me ama;",
+            "time": 235,
+            "isSolo": false
+          },
+          {
+            "text": "a Bíblia assim me",
+            "time": 237,
+            "isSolo": false
+          },
+          {
+            "text": "diz!",
+            "time": 240,
+            "isSolo": false
+          },
+          {
+            "text": "HOMENS",
+            "time": 241,
+            "isSolo": true
+          },
+          {
+            "text": "Só um amor grandioso em poder,",
+            "time": 241,
+            "isSolo": false
+          },
+          {
+            "text": "TODOS",
+            "time": 245,
+            "isSolo": true
+          },
+          {
+            "text": "que não muda, não falha,",
+            "time": 245,
+            "isSolo": false
+          },
+          {
+            "text": "poderá nos suster.",
+            "time": 247,
+            "isSolo": false
+          },
+          {
+            "text": "Quem me escolheu",
+            "time": 250,
+            "isSolo": false
+          },
+          {
+            "text": "confiou-me a missão",
+            "time": 252,
+            "isSolo": false
+          },
+          {
+            "text": "de levar pelo mundo",
+            "time": 255,
+            "isSolo": false
+          },
+          {
+            "text": "a resposta à questão:",
+            "time": 257,
+            "isSolo": false
+          },
+          {
+            "text": "Onde está o amor?",
+            "time": 260,
+            "isSolo": false
+          },
+          {
+            "text": "Quem irá por Deus?",
+            "time": 269,
+            "isSolo": false
+          },
+          {
+            "text": "Eu vou!",
+            "time": 278,
+            "isSolo": false
+          },
+          {
+            "text": "Serei a voz que clama;",
+            "time": 279,
+            "isSolo": false
+          },
+          {
+            "text": "serei a luz que emana;",
+            "time": 281,
+            "isSolo": false
+          },
+          {
+            "text": "serei a mão do Reino",
+            "time": 283,
+            "isSolo": false
+          },
+          {
+            "text": "a quem padece em dor!",
+            "time": 286,
+            "isSolo": false
+          },
+          {
+            "text": "Serei a porta aberta;",
+            "time": 289,
+            "isSolo": false
+          },
+          {
+            "text": "serei a ajuda certa,",
+            "time": 291,
+            "isSolo": false
+          },
+          {
+            "text": "estando sempre alerta",
+            "time": 294,
+            "isSolo": false
+          },
+          {
+            "text": "à voz do Salvador!",
+            "time": 294,
+            "isSolo": false
+          },
+          {
+            "text": "Que",
+            "time": 300,
+            "isSolo": false
+          },
+          {
+            "text": "tudo em mim só declare",
+            "time": 301,
+            "isSolo": false
+          },
+          {
+            "text": "que Deus é amor!",
+            "time": 302,
+            "isSolo": false
+          },
+          {
+            "text": "Eu vou!",
+            "time": 307,
+            "isSolo": false
+          },
+          {
+            "text": "Eu vou!",
+            "time": 318,
+            "isSolo": false
+          },
+          {
+            "text": "HOMENS",
+            "time": 327,
+            "isSolo": true
+          },
+          {
+            "text": "Onde está o amor?",
+            "time": 327,
+            "isSolo": false
+          },
+          {
+            "text": "MULHERES",
+            "time": 333,
+            "isSolo": true
+          },
+          {
+            "text": "Serei a voz que clama!",
+            "time": 333,
+            "isSolo": false
+          },
+          {
+            "text": "Serei a luz que emana!",
+            "time": 335,
+            "isSolo": false
+          },
+          {
+            "text": "TODOS",
+            "time": 336,
+            "isSolo": true
+          },
+          {
+            "text": "Quem irá por Deus?",
+            "time": 336,
+            "isSolo": false
+          },
+          {
+            "text": "Eu vou!",
+            "time": 546,
+            "isSolo": false
+          }
+        ]
+      }
     }
   ]
 }
