@@ -2163,12 +2163,17 @@
             "isSolo": false
           },
           {
+            "text": "SOPRANO",
+            "time": 128,
+            "isSolo": true
+          },
+          {
             "text": "o Seu grande amor!",
             "time": 128,
             "isSolo": false
           },
           {
-            "text": "TODOS",
+            "text": "CONTRALTO + HOMENS",
             "time": 132,
             "isSolo": true
           },
@@ -2186,6 +2191,21 @@
             "text": "poderá nos suster.",
             "time": 140,
             "isSolo": false
+          },
+          {
+            "text": "SOPRANO",
+            "time": 143,
+            "isSolo": true
+          },
+          {
+            "text": "Ohhh",
+            "time": 143,
+            "isSolo": false
+          },
+          {
+            "text": "TODOS",
+            "time": 144,
+            "isSolo": true
           },
           {
             "text": "Quem me escolheu",
@@ -2239,7 +2259,7 @@
           },
           {
             "text": "deu-nos Seu Filho;",
-            "time": 174,
+            "time": 173,
             "isSolo": false
           },
           {
@@ -2269,22 +2289,22 @@
           },
           {
             "text": "MULHERES",
-            "time": 200,
+            "time": 199,
             "isSolo": true
           },
           {
-            "text": "Uh...",
-            "time": 200,
+            "text": "Uhhh",
+            "time": 199,
             "isSolo": false
           },
           {
             "text": "HOMENS",
-            "time": 202,
+            "time": 199.5,
             "isSolo": true
           },
           {
             "text": "Ele se entregou,",
-            "time": 202,
+            "time": 199.5,
             "isSolo": false
           },
           {
@@ -2454,7 +2474,7 @@
           },
           {
             "text": "estando sempre alerta",
-            "time": 294,
+            "time": 293,
             "isSolo": false
           },
           {
@@ -2484,11 +2504,11 @@
           },
           {
             "text": "Eu vou!",
-            "time": 318,
+            "time": 317,
             "isSolo": false
           },
           {
-            "text": "HOMENS",
+            "text": "SOPRANO + BARÍTONO",
             "time": 327,
             "isSolo": true
           },
@@ -2498,7 +2518,7 @@
             "isSolo": false
           },
           {
-            "text": "MULHERES",
+            "text": "CONTRALTO + TENOR",
             "time": 333,
             "isSolo": true
           },
