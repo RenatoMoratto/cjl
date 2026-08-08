@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 
-export function useLocalAudioPlayer(audioSrc: string) {
+/**
+ * `audioSrc` is optional because the URL now arrives asynchronously from the
+ * API. Passing undefined keeps the hook idle instead of constructing an Audio
+ * element pointed at a half-built URL.
+ */
+export function useLocalAudioPlayer(audioSrc?: string) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
@@ -55,6 +60,14 @@ export function useLocalAudioPlayer(audioSrc: string) {
   };
 
   useEffect(() => {
+    if (!audioSrc) {
+      audioRef.current = null;
+      setIsPlaying(false);
+      setDuration(0);
+      setCurrentTime(0);
+      return;
+    }
+
     const audio = new Audio(audioSrc);
     audioRef.current = audio;
 

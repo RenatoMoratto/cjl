@@ -19,25 +19,43 @@ export interface Agenda {
   events: Event[];
 }
 
-export interface Song {
+export const VOICES = [
+  "soprano",
+  "contralto",
+  "tenor",
+  "baixo",
+  "todos",
+] as const;
+
+export type Voice = (typeof VOICES)[number];
+
+export function isVoice(value: string): value is Voice {
+  return (VOICES as readonly string[]).includes(value);
+}
+
+/** A single voice kit, with the audio URL already resolved server-side. */
+export interface SongTrack {
+  voice: Voice;
+  url: string;
+}
+
+/** Shape returned by /api/musicas — enough to render the song list. */
+export interface SongSummary {
   id: number;
-  status: Status;
+  slug: string;
   title: string;
   author: string;
-  musicPath: string;
   imageUrl: string;
+}
+
+/** Shape returned by /api/musicas/[id] — adds lyrics and the available kits. */
+export interface SongDetail extends SongSummary {
+  status: Status;
   lyrics: Lyrics;
+  tracks: SongTrack[];
 }
 
 export enum Status {
   active = "active",
   inactive = "inactive",
-}
-
-export enum Naipes {
-  soprano,
-  tenor,
-  contralto,
-  baixo,
-  todos,
 }

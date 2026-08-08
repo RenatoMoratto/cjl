@@ -3,14 +3,14 @@ import Layout from "@/components/Layout";
 import { CaretLeft } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { Song } from "@/types";
+import { SongSummary } from "@/types";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 export default function Songs() {
   const params = useParams();
 
-  const [songs, setSongs] = useState<Array<Song>>([]);
+  const [songs, setSongs] = useState<Array<SongSummary>>([]);
   const [loading, setLoading] = useState(true);
 
   const voice = params?.voz ?? "";
@@ -29,7 +29,7 @@ export default function Songs() {
           throw new Error("Músicas não encontradas");
         }
 
-        const data: Array<Song> = await response.json();
+        const data: Array<SongSummary> = await response.json();
         setSongs(data);
       } catch (error) {
         toast.error((error as Error).message);

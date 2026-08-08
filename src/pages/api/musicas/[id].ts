@@ -1,33 +1,35 @@
-import path from "path";
-import { promises as fs } from "fs";
 import { NextApiRequest, NextApiResponse } from "next";
-import { Song } from "@/types";
+
+import { getSongById } from "@/services/songs";
+import { SongDetail } from "@/types";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Song | { error: string }>,
+  res: NextApiResponse<SongDetail | { error: string }>,
 ) {
-  const { id } = req.query;
+  const id = Number(
+    Array.isArray(req.query.id) ? req.query.id[0] : req.query.id,
+  );
+
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({ error: "Identificador inválido" });
+  }
 
   try {
-    const jsonDirectory = path.join(process.cwd(), "json");
-    const fileContent = await fs.readFile(
-      path.join(jsonDirectory, "musicas.json"),
-      "utf8",
-    );
+    const song = await getSongById(id);
 
-    const musicas = JSON.parse(fileContent).songs;
-
-    const musica = musicas.find((m: Song) => m.id === Number(id));
-
-    if (!musica) {
+    if (!song) {
       return res.status(404).json({ error: "Música não encontrada" });
     }
 
-    return res.status(200).json(musica);
+    res.setHeader(
+      "Cache-Control",
+      "public, s-maxage=300, stale-while-revalidate=86400",
+    );
+
+    return res.status(200).json(song);
   } catch (error) {
-    return res
-      .status(500)
-      .json({ error: `Erro ao ler ou parsear o arquivo: ${error}` });
+    console.error(`Failed to load song ${id}`, error);
+    return res.status(500).json({ error: "Erro ao carregar a música" });
   }
 }

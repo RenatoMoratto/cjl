@@ -5,7 +5,7 @@ import { CaretLeft } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState, lazy, Suspense } from "react";
-import { Song } from "@/types";
+import { isVoice, SongDetail } from "@/types";
 import TextSettingsDropdown from "@/components/TextSettingsDropdown";
 import { useCopyToClipboard, useLocalStorage } from "usehooks-ts";
 import { toast } from "react-toastify";
@@ -16,7 +16,7 @@ const SongPlayer = lazy(() => import("@/components/SongPlayer"));
 export default function Musica() {
   const params = useParams();
 
-  const [song, setSong] = useState<Song>();
+  const [song, setSong] = useState<SongDetail>();
   const [enableReading, setEnableReading] = useLocalStorage(
     "enable-reading",
     true,
@@ -28,12 +28,17 @@ export default function Musica() {
     "center",
   );
   const [fontSize, setFontSize] = useLocalStorage("font-size", 22);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [, copyToClipboard] = useCopyToClipboard();
 
-  const voice = params?.voz ?? "";
+  const rawVoice = Array.isArray(params?.voz) ? params.voz[0] : params?.voz;
+  const voice = rawVoice && isVoice(rawVoice) ? rawVoice : undefined;
   const songId = Number(params?.musica ?? "");
 
-  const songPath = `${song?.musicPath}/${voice}.mp3`;
+  // A song may simply not have a kit for this voice — five of them have no
+  // "todos" mix — and the URL segment itself is user-supplied.
+  const track = song?.tracks.find((item) => item.voice === voice);
+  const isTrackUnavailable = Boolean(song) && !track;
 
   const {
     volume,
@@ -46,10 +51,11 @@ export default function Musica() {
     toggleReplay,
     handleSeek,
     handleVolumeChange,
-  } = useLocalAudioPlayer(songPath);
+  } = useLocalAudioPlayer(track?.url);
 
-  const formattedVoice =
-    voice?.at(0)?.toUpperCase() + voice?.toString().substring(1);
+  const formattedVoice = voice
+    ? voice.charAt(0).toUpperCase() + voice.slice(1)
+    : "";
 
   useEffect(() => {
     const fetchMusica = async () => {
@@ -60,7 +66,7 @@ export default function Musica() {
         if (!response.ok) {
           throw new Error("Música não encontrada");
         }
-        const data: Song = await response.json();
+        const data: SongDetail = await response.json();
         setSong(data);
         setError(null);
       } catch (error) {
@@ -75,13 +81,36 @@ export default function Musica() {
     }
   }, [songId]);
 
-  const handleDownloadMp3 = () => {
-    if (!song) return;
-    const downloadLink = document.createElement("a");
-    downloadLink.href = songPath;
-    downloadLink.download = `${song.title} - ${formattedVoice}.mp3`;
-    downloadLink.click();
-    toast.success("Download iniciado");
+  // The browser ignores the `download` attribute on cross-origin links, so the
+  // file is fetched and re-served as a same-origin blob URL. This depends on
+  // the R2 bucket allowing cross-origin GETs.
+  const handleDownloadMp3 = async () => {
+    if (!song || !track || isDownloading) return;
+
+    setIsDownloading(true);
+
+    try {
+      const response = await fetch(track.url);
+
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+
+      const objectUrl = URL.createObjectURL(await response.blob());
+      const downloadLink = document.createElement("a");
+
+      downloadLink.href = objectUrl;
+      downloadLink.download = `${song.title} - ${formattedVoice}.mp3`;
+      downloadLink.click();
+
+      URL.revokeObjectURL(objectUrl);
+      toast.success("Download concluído");
+    } catch (error) {
+      console.error("Failed to download track", error);
+      toast.error("Não foi possível baixar o arquivo");
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   const handleCopyLyric = () => {
@@ -96,7 +125,7 @@ export default function Musica() {
         <div className="h-full w-full p-5 flex flex-col gap-3 rounded-3xl bg-gray-800 overflow-hidden">
           <div className="w-full grid place-items-center">
             <div className="w-full flex items-center justify-between">
-              <Link href={`/kits/${voice}`}>
+              <Link href={voice ? `/kits/${voice}` : "/kits"}>
                 <CaretLeft size={32} weight="bold" />
               </Link>
               <h2 className="w-full text-center text-3xl font-bold text-gray-50">
@@ -110,6 +139,7 @@ export default function Musica() {
                   onToggleReading={() => setEnableReading((prev) => !prev)}
                   onChangeTextAlign={(align) => setTextAlign(align)}
                   onDownloadMp3={handleDownloadMp3}
+                  canDownloadMp3={Boolean(track) && !isDownloading}
                   onChangeFontSize={(size) => setFontSize(size)}
                   onCopyLyrics={handleCopyLyric}
                 />
@@ -120,10 +150,15 @@ export default function Musica() {
             </h3>
           </div>
 
-          {(loading || error) && (
+          {(loading || error || isTrackUnavailable) && (
             <div className="text-center">
               {loading && <p className="text-gray-50">Carregando...</p>}
               {error && <p className="text-red-500">{error}</p>}
+              {isTrackUnavailable && (
+                <p className="text-gray-100">
+                  Kit de voz indisponível para esta música.
+                </p>
+              )}
             </div>
           )}
 
@@ -139,27 +174,29 @@ export default function Musica() {
           )}
         </div>
 
-        <div className="w-full p-5 rounded-3xl bg-gray-800">
-          <Suspense
-            fallback={
-              <div className="text-center text-gray-50">
-                Carregando player...
-              </div>
-            }
-          >
-            <SongPlayer
-              currentTime={currentTime}
-              duration={duration}
-              isPlaying={isPlaying}
-              togglePlay={togglePlay}
-              isReplayEnabled={isReplayEnabled}
-              toggleReplay={toggleReplay}
-              handleSeek={handleSeek}
-              volume={volume}
-              handleVolumeChange={handleVolumeChange}
-            />
-          </Suspense>
-        </div>
+        {!isTrackUnavailable && (
+          <div className="w-full p-5 rounded-3xl bg-gray-800">
+            <Suspense
+              fallback={
+                <div className="text-center text-gray-50">
+                  Carregando player...
+                </div>
+              }
+            >
+              <SongPlayer
+                currentTime={currentTime}
+                duration={duration}
+                isPlaying={isPlaying}
+                togglePlay={togglePlay}
+                isReplayEnabled={isReplayEnabled}
+                toggleReplay={toggleReplay}
+                handleSeek={handleSeek}
+                volume={volume}
+                handleVolumeChange={handleVolumeChange}
+              />
+            </Suspense>
+          </div>
+        )}
       </div>
     </Layout>
   );
