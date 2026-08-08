@@ -1,5 +1,10 @@
 import { Html, Head, Main, NextScript } from "next/document";
 
+/** Absolute base for social-card URLs, without a trailing slash. */
+const SITE_URL = "https://coraljovemlondrina.com.br";
+
+const SOCIAL_IMAGE_URL = `${SITE_URL}/images/logo-fundo.webp`;
+
 export default function Document() {
   return (
     <Html lang="pt-BR">
@@ -23,14 +28,8 @@ export default function Document() {
           property="og:description"
           content="Com fé e propósito, damos voz à nossa missão. A mensagem do advento a todo mundo em nossa geração."
         />
-        <meta
-          property="og:image"
-          content="https://https://coraljovemlondrina.com.br//images/logo-fundo.webp"
-        />
-        <meta
-          property="og:url"
-          content="https://https://coraljovemlondrina.com.br/"
-        />
+        <meta property="og:image" content={SOCIAL_IMAGE_URL} />
+        <meta property="og:url" content={SITE_URL} />
         <meta property="og:site_name" content="Coral Jovem de Londrina" />
 
         {/* Twitter Card Meta Tags */}
@@ -40,10 +39,7 @@ export default function Document() {
           name="twitter:description"
           content="Com fé e propósito, damos voz à nossa missão. A mensagem do advento a todo mundo em nossa geração."
         />
-        <meta
-          name="twitter:image"
-          content="https://https://coraljovemlondrina.com.br//images/logo-fundo.webp"
-        />
+        <meta name="twitter:image" content={SOCIAL_IMAGE_URL} />
 
         {/* Favicon */}
         <link rel="icon" href="/favicon.ico" />
