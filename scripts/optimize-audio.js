@@ -6,8 +6,18 @@ const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
 const ffmpeg = require("fluent-ffmpeg");
 ffmpeg.setFfmpegPath(ffmpegPath);
 
-const songsDir = path.join(__dirname, "../public/songs");
-const outputDir = path.join(__dirname, "../public/songs-optimized");
+// Audio no longer lives in the repo. Drop new kits in audio-staging/<slug>/
+// as <voice>.mp3, optimize them here, then publish with `npm run r2:upload`.
+// Both directories are gitignored.
+const songsDir = path.join(__dirname, "../audio-staging");
+const outputDir = path.join(__dirname, "../audio-staging-optimized");
+
+if (!fs.existsSync(songsDir)) {
+  console.log(
+    `Nothing to do: ${path.relative(process.cwd(), songsDir)} does not exist.`,
+  );
+  process.exit(0);
+}
 
 // Create output directory if it doesn't exist
 if (!fs.existsSync(outputDir)) {

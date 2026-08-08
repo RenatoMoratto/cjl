@@ -1,10 +1,11 @@
 /**
- * Uploads the voice-kit MP3s from public/songs to Cloudflare R2.
+ * Uploads voice-kit MP3s to Cloudflare R2.
  *
  *   npx tsx scripts/upload-songs-r2.ts [--dry-run]
  *
- * Files present in public/songs-optimized take precedence over public/songs,
- * matching the convention already used by scripts/optimize-audio.js.
+ * Drop new kits in audio-staging/<slug>/<voice>.mp3, optionally run
+ * `npm run optimize:audio`, then run this. Files present in
+ * audio-staging-optimized take precedence over audio-staging.
  *
  * The script is idempotent: an object whose size already matches is skipped,
  * so it is safe to re-run after a partial failure.
@@ -28,8 +29,8 @@ config({ path: ".env.local" });
 const VOICES = ["soprano", "contralto", "tenor", "baixo", "todos"] as const;
 type Voice = (typeof VOICES)[number];
 
-const SONGS_DIR = path.join(process.cwd(), "public", "songs");
-const OPTIMIZED_DIR = path.join(process.cwd(), "public", "songs-optimized");
+const SONGS_DIR = path.join(process.cwd(), "audio-staging");
+const OPTIMIZED_DIR = path.join(process.cwd(), "audio-staging-optimized");
 const MANIFEST_PATH = path.join(
   process.cwd(),
   "drizzle",
@@ -72,6 +73,13 @@ function isVoice(value: string): value is Voice {
 
 /** Collects every MP3 on disk, preferring the optimized copy when one exists. */
 async function collectLocalTracks() {
+  if (!(await exists(SONGS_DIR))) {
+    throw new Error(
+      `${path.relative(process.cwd(), SONGS_DIR)} does not exist. ` +
+        `Create it and add <slug>/<voice>.mp3 files before uploading.`,
+    );
+  }
+
   const slugs = (await readdir(SONGS_DIR, { withFileTypes: true }))
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
@@ -180,6 +188,13 @@ async function mapWithConcurrency<T, R>(
 
 async function main() {
   const tracks = await collectLocalTracks();
+
+  if (tracks.length === 0) {
+    throw new Error(
+      `No MP3s found under ${path.relative(process.cwd(), SONGS_DIR)}.`,
+    );
+  }
+
   const totalBytes = tracks.reduce((sum, t) => sum + t.sizeBytes, 0);
 
   console.log(

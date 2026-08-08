@@ -1,23 +1,22 @@
 /**
- * Gate that must pass before the old JSON and MP3 files are deleted.
+ * Health check for the song data: run it after any seed or upload, and before
+ * anything destructive.
  *
  *   npx tsx scripts/verify-migration.ts
  *
  * Checks three things:
- *   1. the database is internally consistent and matches json/musicas.json;
+ *   1. the database is internally consistent;
  *   2. every track row points at an object that really exists in R2, with a
  *      matching size;
  *   3. those objects are publicly readable over R2_PUBLIC_URL and support the
  *      range requests the player relies on for seeking.
  *
- * Exits non-zero on the first failed check.
+ * Exits non-zero if any check fails.
  */
 
 import { HeadObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { config } from "dotenv";
 import { sql } from "drizzle-orm";
-import { readFile } from "node:fs/promises";
-import path from "node:path";
 
 config({ path: ".env.local" });
 
@@ -53,10 +52,6 @@ async function main() {
 
   console.log("\nDatabase");
 
-  const source = JSON.parse(
-    await readFile(path.join(process.cwd(), "json/musicas.json"), "utf8"),
-  ) as { songs: Array<{ id: number; status: string; musicPath: string }> };
-
   const [stats] = (
     await db.execute(sql`
       SELECT
@@ -73,19 +68,11 @@ async function main() {
     `)
   ).rows as unknown as Array<Record<string, number>>;
 
-  const expectedActive = source.songs.filter(
-    (s) => s.status === "active",
-  ).length;
-
+  check("songs table is not empty", stats.songs > 0, `${stats.songs} songs`);
   check(
-    "song count matches JSON",
-    stats.songs === source.songs.length,
-    `db=${stats.songs} json=${source.songs.length}`,
-  );
-  check(
-    "active count matches JSON",
-    stats.active === expectedActive,
-    `db=${stats.active} json=${expectedActive}`,
+    "at least one song is active",
+    stats.active > 0,
+    `${stats.active} active`,
   );
   check(
     "slugs are unique",
@@ -100,16 +87,17 @@ async function main() {
     `seq=${stats.seq} max_id=${stats.max_id}`,
   );
 
-  const dbIds = (
-    (await db.execute(sql`SELECT id FROM songs ORDER BY id`))
-      .rows as unknown as Array<{ id: number }>
-  ).map((r) => r.id);
-  const jsonIds = source.songs.map((s) => s.id).sort((a, b) => a - b);
+  const [songsWithoutTracks] = (
+    await db.execute(sql`
+      SELECT count(*)::int AS n FROM songs s
+      WHERE NOT EXISTS (SELECT 1 FROM tracks t WHERE t.song_id = s.id)
+    `)
+  ).rows as unknown as Array<{ n: number }>;
 
   check(
-    "every JSON id survived with the same value",
-    JSON.stringify(dbIds) === JSON.stringify(jsonIds),
-    `db=[${dbIds.join(",")}]`,
+    "every song has at least one track",
+    songsWithoutTracks.n === 0,
+    `${songsWithoutTracks.n} without tracks`,
   );
 
   console.log("\nR2 objects");
