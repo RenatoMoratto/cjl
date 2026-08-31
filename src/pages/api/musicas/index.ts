@@ -1,28 +1,23 @@
-import path from "path";
-import { promises as fs } from "fs";
 import { NextApiRequest, NextApiResponse } from "next";
-import { Song, Status } from "@/types";
+
+import { setPublicSongCacheHeaders, SONGS_CACHE_TAG } from "@/lib/cache";
+import { listActiveSongs } from "@/services/songs";
+import { SongSummary } from "@/types";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Array<Song> | { error: string }>,
+  res: NextApiResponse<Array<SongSummary> | { error: string }>,
 ) {
   try {
-    const jsonDirectory = path.join(process.cwd(), "json");
-    const fileContent = await fs.readFile(
-      path.join(jsonDirectory, "musicas.json"),
-      "utf8",
-    );
+    const songs = await listActiveSongs();
 
-    const musicas: Song[] = JSON.parse(fileContent).songs;
+    // Served from Vercel's CDN, which also hides Neon's cold start from users.
+    // Tagged so any song mutation can purge it on demand — see src/lib/cache.
+    setPublicSongCacheHeaders(res, [SONGS_CACHE_TAG]);
 
-    const activeSongs = musicas.filter((song) => song.status == Status.active);
-    console.log(musicas);
-    console.log(activeSongs);
-    return res.status(200).json(activeSongs);
+    return res.status(200).json(songs);
   } catch (error) {
-    return res
-      .status(500)
-      .json({ error: `Erro ao ler ou parsear o arquivo: ${error}` });
+    console.error("Failed to list songs", error);
+    return res.status(500).json({ error: "Erro ao carregar as músicas" });
   }
 }

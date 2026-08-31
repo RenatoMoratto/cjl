@@ -1,0 +1,482 @@
+[
+  {
+    "slug": "amados",
+    "voice": "baixo",
+    "objectKey": "songs/amados/baixo.mp3",
+    "sizeBytes": 5867949
+  },
+  {
+    "slug": "amados",
+    "voice": "contralto",
+    "objectKey": "songs/amados/contralto.mp3",
+    "sizeBytes": 5884077
+  },
+  {
+    "slug": "amados",
+    "voice": "soprano",
+    "objectKey": "songs/amados/soprano.mp3",
+    "sizeBytes": 5884077
+  },
+  {
+    "slug": "amados",
+    "voice": "tenor",
+    "objectKey": "songs/amados/tenor.mp3",
+    "sizeBytes": 5867949
+  },
+  {
+    "slug": "cancao-do-apocalipse",
+    "voice": "baixo",
+    "objectKey": "songs/cancao-do-apocalipse/baixo.mp3",
+    "sizeBytes": 5471411
+  },
+  {
+    "slug": "cancao-do-apocalipse",
+    "voice": "contralto",
+    "objectKey": "songs/cancao-do-apocalipse/contralto.mp3",
+    "sizeBytes": 5471411
+  },
+  {
+    "slug": "cancao-do-apocalipse",
+    "voice": "soprano",
+    "objectKey": "songs/cancao-do-apocalipse/soprano.mp3",
+    "sizeBytes": 5471411
+  },
+  {
+    "slug": "cancao-do-apocalipse",
+    "voice": "tenor",
+    "objectKey": "songs/cancao-do-apocalipse/tenor.mp3",
+    "sizeBytes": 5471411
+  },
+  {
+    "slug": "digno",
+    "voice": "baixo",
+    "objectKey": "songs/digno/baixo.mp3",
+    "sizeBytes": 5071142
+  },
+  {
+    "slug": "digno",
+    "voice": "contralto",
+    "objectKey": "songs/digno/contralto.mp3",
+    "sizeBytes": 5071142
+  },
+  {
+    "slug": "digno",
+    "voice": "soprano",
+    "objectKey": "songs/digno/soprano.mp3",
+    "sizeBytes": 5071142
+  },
+  {
+    "slug": "digno",
+    "voice": "tenor",
+    "objectKey": "songs/digno/tenor.mp3",
+    "sizeBytes": 5071142
+  },
+  {
+    "slug": "eis-me-aqui",
+    "voice": "baixo",
+    "objectKey": "songs/eis-me-aqui/baixo.mp3",
+    "sizeBytes": 3788932
+  },
+  {
+    "slug": "eis-me-aqui",
+    "voice": "contralto",
+    "objectKey": "songs/eis-me-aqui/contralto.mp3",
+    "sizeBytes": 3788932
+  },
+  {
+    "slug": "eis-me-aqui",
+    "voice": "soprano",
+    "objectKey": "songs/eis-me-aqui/soprano.mp3",
+    "sizeBytes": 3796226
+  },
+  {
+    "slug": "eis-me-aqui",
+    "voice": "tenor",
+    "objectKey": "songs/eis-me-aqui/tenor.mp3",
+    "sizeBytes": 3788928
+  },
+  {
+    "slug": "eis-me-aqui",
+    "voice": "todos",
+    "objectKey": "songs/eis-me-aqui/todos.mp3",
+    "sizeBytes": 3796224
+  },
+  {
+    "slug": "ele-voltara",
+    "voice": "baixo",
+    "objectKey": "songs/ele-voltara/baixo.mp3",
+    "sizeBytes": 3324717
+  },
+  {
+    "slug": "ele-voltara",
+    "voice": "contralto",
+    "objectKey": "songs/ele-voltara/contralto.mp3",
+    "sizeBytes": 3324717
+  },
+  {
+    "slug": "ele-voltara",
+    "voice": "soprano",
+    "objectKey": "songs/ele-voltara/soprano.mp3",
+    "sizeBytes": 3324717
+  },
+  {
+    "slug": "ele-voltara",
+    "voice": "tenor",
+    "objectKey": "songs/ele-voltara/tenor.mp3",
+    "sizeBytes": 3324717
+  },
+  {
+    "slug": "ele-voltara",
+    "voice": "todos",
+    "objectKey": "songs/ele-voltara/todos.mp3",
+    "sizeBytes": 3297324
+  },
+  {
+    "slug": "eu-confio-em-ti",
+    "voice": "baixo",
+    "objectKey": "songs/eu-confio-em-ti/baixo.mp3",
+    "sizeBytes": 3652453
+  },
+  {
+    "slug": "eu-confio-em-ti",
+    "voice": "contralto",
+    "objectKey": "songs/eu-confio-em-ti/contralto.mp3",
+    "sizeBytes": 3652652
+  },
+  {
+    "slug": "eu-confio-em-ti",
+    "voice": "soprano",
+    "objectKey": "songs/eu-confio-em-ti/soprano.mp3",
+    "sizeBytes": 3652650
+  },
+  {
+    "slug": "eu-confio-em-ti",
+    "voice": "tenor",
+    "objectKey": "songs/eu-confio-em-ti/tenor.mp3",
+    "sizeBytes": 3652453
+  },
+  {
+    "slug": "eu-confio-em-ti",
+    "voice": "todos",
+    "objectKey": "songs/eu-confio-em-ti/todos.mp3",
+    "sizeBytes": 3652640
+  },
+  {
+    "slug": "flui-em-nos",
+    "voice": "baixo",
+    "objectKey": "songs/flui-em-nos/baixo.mp3",
+    "sizeBytes": 3734021
+  },
+  {
+    "slug": "flui-em-nos",
+    "voice": "contralto",
+    "objectKey": "songs/flui-em-nos/contralto.mp3",
+    "sizeBytes": 3734021
+  },
+  {
+    "slug": "flui-em-nos",
+    "voice": "soprano",
+    "objectKey": "songs/flui-em-nos/soprano.mp3",
+    "sizeBytes": 3734019
+  },
+  {
+    "slug": "flui-em-nos",
+    "voice": "tenor",
+    "objectKey": "songs/flui-em-nos/tenor.mp3",
+    "sizeBytes": 3734017
+  },
+  {
+    "slug": "flui-em-nos",
+    "voice": "todos",
+    "objectKey": "songs/flui-em-nos/todos.mp3",
+    "sizeBytes": 4098049
+  },
+  {
+    "slug": "glorioso",
+    "voice": "baixo",
+    "objectKey": "songs/glorioso/baixo.mp3",
+    "sizeBytes": 3906085
+  },
+  {
+    "slug": "glorioso",
+    "voice": "contralto",
+    "objectKey": "songs/glorioso/contralto.mp3",
+    "sizeBytes": 3906085
+  },
+  {
+    "slug": "glorioso",
+    "voice": "soprano",
+    "objectKey": "songs/glorioso/soprano.mp3",
+    "sizeBytes": 3906083
+  },
+  {
+    "slug": "glorioso",
+    "voice": "tenor",
+    "objectKey": "songs/glorioso/tenor.mp3",
+    "sizeBytes": 3906081
+  },
+  {
+    "slug": "glorioso",
+    "voice": "todos",
+    "objectKey": "songs/glorioso/todos.mp3",
+    "sizeBytes": 3906081
+  },
+  {
+    "slug": "intensamente",
+    "voice": "baixo",
+    "objectKey": "songs/intensamente/baixo.mp3",
+    "sizeBytes": 5455343
+  },
+  {
+    "slug": "intensamente",
+    "voice": "contralto",
+    "objectKey": "songs/intensamente/contralto.mp3",
+    "sizeBytes": 5467412
+  },
+  {
+    "slug": "intensamente",
+    "voice": "soprano",
+    "objectKey": "songs/intensamente/soprano.mp3",
+    "sizeBytes": 5899499
+  },
+  {
+    "slug": "intensamente",
+    "voice": "tenor",
+    "objectKey": "songs/intensamente/tenor.mp3",
+    "sizeBytes": 5864791
+  },
+  {
+    "slug": "natal-feliz-natal",
+    "voice": "baixo",
+    "objectKey": "songs/natal-feliz-natal/baixo.mp3",
+    "sizeBytes": 2509539
+  },
+  {
+    "slug": "natal-feliz-natal",
+    "voice": "contralto",
+    "objectKey": "songs/natal-feliz-natal/contralto.mp3",
+    "sizeBytes": 2509539
+  },
+  {
+    "slug": "natal-feliz-natal",
+    "voice": "soprano",
+    "objectKey": "songs/natal-feliz-natal/soprano.mp3",
+    "sizeBytes": 2509539
+  },
+  {
+    "slug": "natal-feliz-natal",
+    "voice": "tenor",
+    "objectKey": "songs/natal-feliz-natal/tenor.mp3",
+    "sizeBytes": 2509539
+  },
+  {
+    "slug": "natal-feliz-natal",
+    "voice": "todos",
+    "objectKey": "songs/natal-feliz-natal/todos.mp3",
+    "sizeBytes": 2509471
+  },
+  {
+    "slug": "nosso-deus",
+    "voice": "baixo",
+    "objectKey": "songs/nosso-deus/baixo.mp3",
+    "sizeBytes": 4604474
+  },
+  {
+    "slug": "nosso-deus",
+    "voice": "contralto",
+    "objectKey": "songs/nosso-deus/contralto.mp3",
+    "sizeBytes": 4604482
+  },
+  {
+    "slug": "nosso-deus",
+    "voice": "soprano",
+    "objectKey": "songs/nosso-deus/soprano.mp3",
+    "sizeBytes": 4604478
+  },
+  {
+    "slug": "nosso-deus",
+    "voice": "tenor",
+    "objectKey": "songs/nosso-deus/tenor.mp3",
+    "sizeBytes": 4604474
+  },
+  {
+    "slug": "nosso-deus",
+    "voice": "todos",
+    "objectKey": "songs/nosso-deus/todos.mp3",
+    "sizeBytes": 4604894
+  },
+  {
+    "slug": "ouve-meu-coracao",
+    "voice": "baixo",
+    "objectKey": "songs/ouve-meu-coracao/baixo.mp3",
+    "sizeBytes": 5020043
+  },
+  {
+    "slug": "ouve-meu-coracao",
+    "voice": "contralto",
+    "objectKey": "songs/ouve-meu-coracao/contralto.mp3",
+    "sizeBytes": 4977035
+  },
+  {
+    "slug": "ouve-meu-coracao",
+    "voice": "soprano",
+    "objectKey": "songs/ouve-meu-coracao/soprano.mp3",
+    "sizeBytes": 4977033
+  },
+  {
+    "slug": "ouve-meu-coracao",
+    "voice": "tenor",
+    "objectKey": "songs/ouve-meu-coracao/tenor.mp3",
+    "sizeBytes": 5018119
+  },
+  {
+    "slug": "ouve-meu-coracao",
+    "voice": "todos",
+    "objectKey": "songs/ouve-meu-coracao/todos.mp3",
+    "sizeBytes": 5018119
+  },
+  {
+    "slug": "santo-espirito",
+    "voice": "baixo",
+    "objectKey": "songs/santo-espirito/baixo.mp3",
+    "sizeBytes": 4552002
+  },
+  {
+    "slug": "santo-espirito",
+    "voice": "contralto",
+    "objectKey": "songs/santo-espirito/contralto.mp3",
+    "sizeBytes": 4566200
+  },
+  {
+    "slug": "santo-espirito",
+    "voice": "soprano",
+    "objectKey": "songs/santo-espirito/soprano.mp3",
+    "sizeBytes": 4561892
+  },
+  {
+    "slug": "santo-espirito",
+    "voice": "tenor",
+    "objectKey": "songs/santo-espirito/tenor.mp3",
+    "sizeBytes": 4982276
+  },
+  {
+    "slug": "santo-pra-sempre",
+    "voice": "baixo",
+    "objectKey": "songs/santo-pra-sempre/baixo.mp3",
+    "sizeBytes": 4804613
+  },
+  {
+    "slug": "santo-pra-sempre",
+    "voice": "contralto",
+    "objectKey": "songs/santo-pra-sempre/contralto.mp3",
+    "sizeBytes": 4804617
+  },
+  {
+    "slug": "santo-pra-sempre",
+    "voice": "soprano",
+    "objectKey": "songs/santo-pra-sempre/soprano.mp3",
+    "sizeBytes": 4804615
+  },
+  {
+    "slug": "santo-pra-sempre",
+    "voice": "tenor",
+    "objectKey": "songs/santo-pra-sempre/tenor.mp3",
+    "sizeBytes": 4804613
+  },
+  {
+    "slug": "santo-pra-sempre",
+    "voice": "todos",
+    "objectKey": "songs/santo-pra-sempre/todos.mp3",
+    "sizeBytes": 4788101
+  },
+  {
+    "slug": "uma-geracao",
+    "voice": "baixo",
+    "objectKey": "songs/uma-geracao/baixo.mp3",
+    "sizeBytes": 4166507
+  },
+  {
+    "slug": "uma-geracao",
+    "voice": "contralto",
+    "objectKey": "songs/uma-geracao/contralto.mp3",
+    "sizeBytes": 4194155
+  },
+  {
+    "slug": "uma-geracao",
+    "voice": "soprano",
+    "objectKey": "songs/uma-geracao/soprano.mp3",
+    "sizeBytes": 4166505
+  },
+  {
+    "slug": "uma-geracao",
+    "voice": "tenor",
+    "objectKey": "songs/uma-geracao/tenor.mp3",
+    "sizeBytes": 4166503
+  },
+  {
+    "slug": "uma-geracao",
+    "voice": "todos",
+    "objectKey": "songs/uma-geracao/todos.mp3",
+    "sizeBytes": 4185319
+  },
+  {
+    "slug": "vem-a-nos",
+    "voice": "baixo",
+    "objectKey": "songs/vem-a-nos/baixo.mp3",
+    "sizeBytes": 5463170
+  },
+  {
+    "slug": "vem-a-nos",
+    "voice": "contralto",
+    "objectKey": "songs/vem-a-nos/contralto.mp3",
+    "sizeBytes": 5463171
+  },
+  {
+    "slug": "vem-a-nos",
+    "voice": "soprano",
+    "objectKey": "songs/vem-a-nos/soprano.mp3",
+    "sizeBytes": 5463169
+  },
+  {
+    "slug": "vem-a-nos",
+    "voice": "tenor",
+    "objectKey": "songs/vem-a-nos/tenor.mp3",
+    "sizeBytes": 5463167
+  },
+  {
+    "slug": "vem-a-nos",
+    "voice": "todos",
+    "objectKey": "songs/vem-a-nos/todos.mp3",
+    "sizeBytes": 5461934
+  },
+  {
+    "slug": "venha-entregar",
+    "voice": "baixo",
+    "objectKey": "songs/venha-entregar/baixo.mp3",
+    "sizeBytes": 3874220
+  },
+  {
+    "slug": "venha-entregar",
+    "voice": "contralto",
+    "objectKey": "songs/venha-entregar/contralto.mp3",
+    "sizeBytes": 3874220
+  },
+  {
+    "slug": "venha-entregar",
+    "voice": "soprano",
+    "objectKey": "songs/venha-entregar/soprano.mp3",
+    "sizeBytes": 3874218
+  },
+  {
+    "slug": "venha-entregar",
+    "voice": "tenor",
+    "objectKey": "songs/venha-entregar/tenor.mp3",
+    "sizeBytes": 3874216
+  },
+  {
+    "slug": "venha-entregar",
+    "voice": "todos",
+    "objectKey": "songs/venha-entregar/todos.mp3",
+    "sizeBytes": 3874216
+  }
+]

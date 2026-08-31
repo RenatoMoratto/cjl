@@ -1,6 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-export function useLocalAudioPlayer(audioSrc: string) {
+/**
+ * `audioSrc` is optional because the URL now arrives asynchronously from the
+ * API. Passing undefined keeps the hook idle instead of constructing an Audio
+ * element pointed at a half-built URL.
+ */
+export function useLocalAudioPlayer(audioSrc?: string) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
@@ -48,6 +53,21 @@ export function useLocalAudioPlayer(audioSrc: string) {
     }
   };
 
+  /**
+   * The clock as the element sees it, right now.
+   *
+   * `currentTime` in state only moves on the `timeupdate` event, which fires
+   * about four times a second. That is fine for a progress bar and useless for
+   * stamping a lyric line: every stamp would land on a 250 ms grid. Reading the
+   * ref sidesteps that, and reading it through a callback keeps the identity
+   * stable for effects, which the returned `audio` — captured during render,
+   * and null on the first pass — does not.
+   */
+  const getCurrentTime = useCallback(
+    () => audioRef.current?.currentTime ?? 0,
+    [],
+  );
+
   const toggleMute = () => {
     if (!audioRef.current) return;
     audioRef.current.muted = !audioRef.current.muted;
@@ -55,6 +75,14 @@ export function useLocalAudioPlayer(audioSrc: string) {
   };
 
   useEffect(() => {
+    if (!audioSrc) {
+      audioRef.current = null;
+      setIsPlaying(false);
+      setDuration(0);
+      setCurrentTime(0);
+      return;
+    }
+
     const audio = new Audio(audioSrc);
     audioRef.current = audio;
 
@@ -112,6 +140,7 @@ export function useLocalAudioPlayer(audioSrc: string) {
     isPlaying,
     duration,
     currentTime,
+    getCurrentTime,
     volume,
     isMuted,
     isReplayEnabled,

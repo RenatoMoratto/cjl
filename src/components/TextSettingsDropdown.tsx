@@ -14,6 +14,7 @@ type TextSettingsDropdownProps = {
   onToggleReading: () => void;
   onChangeTextAlign: (align: "left" | "center") => void;
   onDownloadMp3: () => void;
+  canDownloadMp3?: boolean;
   onChangeFontSize: (size: number) => void;
   onCopyLyrics: () => void;
 };
@@ -25,6 +26,7 @@ export default function TextSettingsDropdown({
   onToggleReading,
   onChangeTextAlign,
   onDownloadMp3,
+  canDownloadMp3 = true,
   onChangeFontSize,
   onCopyLyrics,
 }: TextSettingsDropdownProps) {
@@ -126,7 +128,8 @@ export default function TextSettingsDropdown({
 
           <button
             onClick={onDownloadMp3}
-            className="flex items-center gap-2 w-full text-left px-2 py-1 rounded hover:bg-gray-700 transition"
+            disabled={!canDownloadMp3}
+            className="flex items-center gap-2 w-full text-left px-2 py-1 rounded hover:bg-gray-700 transition disabled:opacity-40 disabled:hover:bg-transparent disabled:cursor-not-allowed"
           >
             <DownloadSimple size={20} />
             Baixar MP3
