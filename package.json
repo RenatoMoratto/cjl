@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test": "node --import tsx --test \"src/**/*.test.ts\"",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "lint:check": "prettier --check .",
@@ -16,16 +17,20 @@
     "db:seed": "tsx scripts/seed-songs.ts",
     "r2:upload": "tsx scripts/upload-songs-r2.ts",
     "r2:cors": "tsx scripts/configure-r2-cors.ts",
+    "r2:purge": "tsx scripts/purge-pending-objects.ts",
     "optimize:audio": "node scripts/optimize-audio.js",
     "optimize:images": "node scripts/optimize-images.js",
     "optimize:all": "npm run optimize:images && npm run optimize:audio",
     "build:optimized": "npm run optimize:all && npm run build"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1106.0",
+    "@aws-sdk/s3-request-presigner": "^3.1106.0",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@neondatabase/serverless": "^1.1.0",
     "@phosphor-icons/react": "^2.1.7",
     "@vercel/analytics": "^1.5.0",
+    "@vercel/functions": "^3.1.4",
     "drizzle-orm": "^0.45.2",
     "fluent-ffmpeg": "^2.1.2",
     "next": "15.1.9",
@@ -36,7 +41,6 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@aws-sdk/client-s3": "^3.1106.0",
     "@eslint/eslintrc": "^3",
     "@types/node": "^20",
     "@types/react": "^19",
