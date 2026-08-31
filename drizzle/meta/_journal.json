@@ -8,6 +8,13 @@
       "when": 1786217645274,
       "tag": "0000_faithful_jean_grey",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1786220013846,
+      "tag": "0001_warm_forgotten_one",
+      "breakpoints": true
     }
   ]
 }
