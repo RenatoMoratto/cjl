@@ -1,5 +1,6 @@
 /**
- * Applies the bucket CORS policy that the "download MP3" button depends on.
+ * Applies the bucket CORS policy that the "download MP3" button and the admin
+ * audio upload depend on.
  *
  *   npx tsx scripts/configure-r2-cors.ts
  *
@@ -7,6 +8,10 @@
  * without it. The download button does, because the `download` attribute is
  * ignored on cross-origin links, so the client fetches the file and re-serves
  * it as a same-origin blob URL.
+ *
+ * Uploads need it too, and need more of it: the browser PUTs the MP3 straight
+ * to R2 with a presigned URL, so the bucket must accept PUT from the site's
+ * origins and must allow the headers that URL's signature covers.
  *
  * NOTE: PutBucketCors is a bucket-level operation. An R2 API token scoped to
  * "Object Read & Write" gets AccessDenied here — it needs "Admin Read & Write".
@@ -64,6 +69,17 @@ const CORS_RULES = [
     AllowedMethods: ["GET", "HEAD"],
     AllowedHeaders: ["range"],
     ExposeHeaders: ["content-length", "content-range", "accept-ranges"],
+    MaxAgeSeconds: 86400,
+  },
+  {
+    // Direct browser uploads. content-type and cache-control are listed
+    // because createPresignedUpload signs both, so the browser has to send
+    // them verbatim or R2 rejects the PUT with a signature mismatch. etag is
+    // exposed so the client can confirm what was stored.
+    AllowedOrigins: ALLOWED_ORIGINS,
+    AllowedMethods: ["PUT"],
+    AllowedHeaders: ["content-type", "cache-control"],
+    ExposeHeaders: ["etag"],
     MaxAgeSeconds: 86400,
   },
 ];
