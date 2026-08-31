@@ -26,9 +26,9 @@ This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-appl
 
 ## Song management API
 
-Server-side CRUD for songs and voice kits. There is no admin UI yet, and the
-routes are **switched off by default** — see "Security" below before enabling
-them anywhere.
+Server-side CRUD for songs and voice kits, plus the admin UI at `/admin` that
+drives it. Both are **switched off by default** and require a signed-in,
+allowlisted Google account — see "Security" below.
 
 Songs live in Neon; the MP3s live in Cloudflare R2 and the database stores only
 object keys, never URLs.
@@ -42,6 +42,11 @@ object keys, never URLs.
 | `src/lib/r2.ts`                   | Presign, HEAD, delete. Never streams audio                  |
 | `src/lib/cache.ts`                | Public CDN cache tags and their invalidation                |
 | `src/lib/api/admin.ts`            | The guard every admin route goes through                    |
+| `src/lib/auth/admins.ts`          | The allowlist and the 404/401/403 policy                    |
+| `src/lib/auth/options.ts`         | NextAuth configuration (Google, JWT session)                |
+| `src/lib/auth/page.ts`            | `withAdminPage`, the guard for `/admin/*` pages             |
+| `src/lib/api/client.ts`           | The browser's typed client for `/api/admin`                 |
+| `src/lib/lyrics.ts`               | Timecode parsing and line helpers for the lyrics editor     |
 | `src/services/songs.ts`           | Song create/update/delete/reorder                           |
 | `src/services/tracks.ts`          | Kit upload/replace/delete                                   |
 | `src/services/storage-cleanup.ts` | Deferred deletion of orphaned R2 objects                    |
@@ -59,6 +64,47 @@ POST   /api/admin/tracks/upload-url step 1 — presign an upload
 POST   /api/admin/tracks            step 3 — persist the uploaded kit
 DELETE /api/admin/tracks/:id        remove one voice kit
 ```
+
+### Admin UI
+
+| Route                      | What it does                                    |
+| -------------------------- | ----------------------------------------------- |
+| `/admin/entrar`            | Google sign-in. The only unguarded admin page   |
+| `/admin`                   | Song list: status, order, delete                |
+| `/admin/musicas/nova`      | Create a song                                   |
+| `/admin/musicas/:id`       | Metadata and the five voice-kit slots           |
+| `/admin/musicas/:id/letra` | Time the lyric against the song's own recording |
+
+**Ordering** is edited with the arrow buttons (or `Alt+↑`/`Alt+↓`) and saved
+explicitly. The request always carries _every_ song id in its new order, never
+a filtered view: the server rejects a list that has drifted from the database,
+which is what stops a stale tab from dropping a song it never saw to the end.
+If that happens the UI says so and offers a reload.
+
+**Changing a slug does not rewrite existing object keys.** Kits already uploaded
+keep the old slug in their path and keep working; only later uploads pick up the
+new one. The form says so when it matters.
+
+**The lyrics editor** plays the song's own kit and stamps the audio element's
+clock — not React state, which only moves about four times a second — onto the
+selected line:
+
+| Key            | Action                            |
+| -------------- | --------------------------------- |
+| `Space`        | play / pause                      |
+| `Enter` or `T` | stamp this line, move to the next |
+| `↑` / `↓`      | change the selected line          |
+| `[` / `]`      | nudge the stamp by ∓0.1 s         |
+| `Backspace`    | clear the stamp                   |
+| `S`            | mark the line as a solo           |
+
+Every shortcut also has a button, and none of them fire while an input is
+focused. Paste the whole lyric first, then play and tap down the lines.
+
+The preview beside the editor is the chorister's own `TextReader`, unmodified.
+It decides which line is active by looking at the _next_ line's stamp, so a line
+timed earlier than the one above it highlights out of order — the editor flags
+those and offers "Ordenar por tempo".
 
 ### Uploading audio
 
@@ -95,19 +141,70 @@ The ordering is deliberate: an orphaned object costs a little storage and is
 invisible, whereas a row pointing at a deleted object is a player that silently
 fails. Run `npm run r2:purge -- --dry-run` to see what is due.
 
+### Google OAuth setup
+
+Google Cloud Console → **APIs & Services → Credentials → Create credentials →
+OAuth client ID → Web application**.
+
+- Authorized JavaScript origins: `https://coraljovemlondrina.com.br`,
+  `http://localhost:3000`
+- Authorized redirect URIs: `https://coraljovemlondrina.com.br/api/auth/callback/google`,
+  `http://localhost:3000/api/auth/callback/google`
+
+The consent screen needs only the default `email` and `profile` scopes, so no
+Google verification review is required. Keep it in "Testing" with the admins as
+test users, or publish it.
+
+Copy the client id and secret into `GOOGLE_CLIENT_ID` and
+`GOOGLE_CLIENT_SECRET`, generate `NEXTAUTH_SECRET` with `openssl rand -base64
+32`, and list the admins in `ADMIN_EMAILS`. **Paste each address exactly as
+Google shows it** — a Gmail dot or plus alias is a different string even though
+it reaches the same inbox, and the id token always returns the canonical form.
+
 ### Security
 
-**These routes have no authentication.** They can create, modify and delete
-songs and hand out write access to the R2 bucket.
+Two latches stand in front of every mutation, and both are applied in
+`requireAdmin` in `src/lib/api/admin.ts`:
 
-They answer `404` unless `ADMIN_API_ENABLED=true` is set in the server
-environment. That is a deployment kill switch, not a security mechanism: while
-the flag is on, anyone who can reach the origin can do anything the admin UI
-could.
+1. `ADMIN_API_ENABLED` must be exactly `"true"`, or every `/api/admin` route —
+   and `/api/auth` and every `/admin` page — answers `404`.
+2. A Google session whose email is in `ADMIN_EMAILS`.
 
-Before shipping an admin UI, put a real identity check in
-`requireAdmin` in `src/lib/api/admin.ts` — every mutation entry point routes
-through it — and keep the flag as a second latch.
+| Situation                               | Answer |
+| --------------------------------------- | ------ |
+| Kill switch off                         | `404`  |
+| Enabled, no session                     | `401`  |
+| Enabled, session, email not on the list | `403`  |
+
+`404` for the switch because the surface genuinely does not exist in that
+deployment, and a `403` would only advertise that it is there and merely
+switched off. `401` and `403` once it is on, because there is now an identity to
+challenge and a sign-in page to send people to.
+
+The allowlist is checked **on every request**, not only at sign-in, so removing
+an address revokes access immediately rather than whenever the session happens
+to expire (8 hours). That is what the `403` branch almost always means in
+practice.
+
+`requireAdmin` is the only way in: every route goes through `withAdminRoute`,
+and there is no way to add one that skips it. The `/admin` pages go through
+`withAdminPage` in `src/lib/auth/page.ts`, which shares the same
+`decideAdminAccess` policy — unit tested in `src/lib/auth/admins.test.ts` — so
+the API and the UI cannot drift on who gets in.
+
+**To grant or revoke access**, edit `ADMIN_EMAILS` and redeploy. An empty or
+unset list admits nobody: it fails closed.
+
+**On Vercel, set these on Production only.** Preview deployments get a fresh
+hostname per deploy, which Google will refuse as an unregistered redirect URI;
+leaving the kill switch unset there means previews have no admin surface at all.
+`NEXTAUTH_URL` is not needed on Vercel — the origin is derived from the
+forwarded host.
+
+There is deliberately no `middleware.ts`. It would run on the Edge runtime,
+where `getServerSession` does not work, so it would need a second copy of the
+allowlist rule at the edge — exactly the drift the single chokepoint exists to
+prevent — while the API would still have to re-check anyway.
 
 ### Database
 

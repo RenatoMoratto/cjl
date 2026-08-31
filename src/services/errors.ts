@@ -37,6 +37,23 @@ export class ServiceError extends Error {
 /** Postgres unique_violation. Raised as a conflict rather than a 500. */
 const UNIQUE_VIOLATION = "23505";
 
+/**
+ * Walks the cause chain, because the code is rarely on the error you catch.
+ *
+ * Drizzle wraps a driver failure in its own Error ("Failed query: ...") and
+ * hangs the original NeonDbError off `cause`, so a top-level check alone
+ * reports a duplicate slug as an unhandled 500 instead of a 409 the form can
+ * show next to the field.
+ */
 export function isUniqueViolation(error: unknown): boolean {
-  return (error as { code?: string })?.code === UNIQUE_VIOLATION;
+  let current = error;
+
+  // Bounded rather than while(current): a cause chain that loops would
+  // otherwise hang the request.
+  for (let depth = 0; current && depth < 5; depth += 1) {
+    if ((current as { code?: string }).code === UNIQUE_VIOLATION) return true;
+    current = (current as { cause?: unknown }).cause;
+  }
+
+  return false;
 }

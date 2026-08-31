@@ -1,5 +1,3 @@
-import { randomBytes } from "node:crypto";
-
 import { ALLOWED_AUDIO_EXTENSION } from "@/lib/audio";
 import { VOICES, type Voice } from "@/types";
 
@@ -54,7 +52,16 @@ export function buildTrackObjectKey(slug: string, voice: Voice): string {
     );
   }
 
-  const version = randomBytes(VERSION_HEX_LENGTH / 2).toString("hex");
+  // Web Crypto rather than node:crypto, so this module stays importable from
+  // the browser: the admin forms reuse the schemas in
+  // src/lib/validation/songs.ts, which reach this file. `crypto` is a global
+  // in Node 19+ (.nvmrc pins 22) and in every browser, and getRandomValues is
+  // the same CSPRNG randomBytes was drawing from.
+  const bytes = new Uint8Array(VERSION_HEX_LENGTH / 2);
+  crypto.getRandomValues(bytes);
+  const version = Array.from(bytes, (b) =>
+    b.toString(16).padStart(2, "0"),
+  ).join("");
 
   return `${AUDIO_KEY_PREFIX}/${slug}/${voice}-${version}${ALLOWED_AUDIO_EXTENSION}`;
 }

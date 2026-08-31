@@ -1,38 +1,47 @@
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
+import { getServerSession } from "next-auth/next";
 import { ZodError, type ZodType } from "zod";
 
+import { decideAdminAccess, isAdminApiEnabled } from "@/lib/auth/admins";
+import { authOptions } from "@/lib/auth/options";
 import { ServiceError } from "@/services/errors";
 
 /**
  * ============================================================================
- * UNAUTHENTICATED MUTATION BOUNDARY — READ BEFORE EXPOSING AN ADMIN UI
+ * THE MUTATION BOUNDARY — READ BEFORE ADDING A ROUTE UNDER /api/admin
  * ============================================================================
  *
  * Every route under /api/admin can create, modify and delete songs, and can
  * hand out write access to the R2 bucket in the form of presigned upload URLs.
- * There is no authentication in this project yet, so there is nothing here
- * that establishes *who* is calling.
+ * Two latches stand in front of all of them, and both are applied here:
  *
- * What this module does instead is keep those routes switched off. Unless
- * ADMIN_API_ENABLED is exactly "true" in the server environment, every admin
- * route answers 404 and no handler runs. That is a deployment kill switch, not
- * a security mechanism: anyone who can reach the origin while the flag is on
- * can do anything the admin UI could.
+ *   1. ADMIN_API_ENABLED must be exactly "true", or every route answers 404 and
+ *      no handler runs. This is a deployment switch, not a statement about the
+ *      caller: leave it unset on preview deployments and the surface simply is
+ *      not there.
+ *   2. A Google session whose email is in ADMIN_EMAILS. The list is checked on
+ *      every request, not only at sign-in, so removing an address revokes
+ *      access immediately instead of at the next login.
  *
- * Deliberately NOT done here, because each would read as protection while
- * providing close to none:
+ * The policy behind the 404/401/403 split lives in decideAdminAccess in
+ * src/lib/auth/admins.ts — a pure function, unit tested, shared with the page
+ * guard in src/lib/auth/page.ts so the API and the UI cannot drift on who gets
+ * in.
+ *
+ * Still deliberately NOT relied on as authentication, because each would read
+ * as protection while providing close to none:
  *   - a shared password or bearer token in an env var, compared in this file;
- *   - a check on Origin, Referer or User-Agent;
+ *   - a check on Origin, Referer or User-Agent to establish who is calling;
  *   - anything enforced in the browser, which is not a trust boundary.
  *
- * Before any admin UI ships, replace requireAdmin's body with a real identity
- * check — a session from an auth provider, or Vercel's deployment protection
- * in front of the routes — and keep the flag as a second latch. Every entry
- * point that needs this is listed in the file header of each route under
- * src/pages/api/admin/, and all of them go through withAdminRoute below.
+ * The Sec-Fetch-Site check below is not an exception to that. It never decides
+ * who the caller is — the session has already done that — and it cannot admit
+ * anyone. It only refuses cross-site writes, layered behind the identity check
+ * rather than in place of one.
+ *
+ * Every entry point that needs this goes through withAdminRoute; there is no
+ * way to add an admin route that skips it.
  */
-
-const ADMIN_ENABLED = process.env.ADMIN_API_ENABLED === "true";
 
 export interface ApiError {
   error: string;
@@ -41,18 +50,58 @@ export interface ApiError {
 }
 
 /**
- * Answers 404 and returns false when the caller must not proceed.
+ * Establishes that the caller may mutate, answering and returning false if not.
  *
- * 404 rather than 401/403: with no identity to challenge, a 403 would only
- * advertise that a mutation surface exists here and is merely switched off.
+ * The session is not read at all while the kill switch is off: there is no JWT
+ * to verify and no cookie to parse, so an unauthenticated prober has nothing
+ * here to work against.
  */
-function requireAdmin(req: NextApiRequest, res: NextApiResponse): boolean {
-  if (!ADMIN_ENABLED) {
-    res.status(404).json({ error: "Not found" });
+async function requireAdmin(
+  req: NextApiRequest,
+  res: NextApiResponse,
+): Promise<boolean> {
+  const enabled = isAdminApiEnabled();
+  const session = enabled
+    ? await getServerSession(req, res, authOptions())
+    : null;
+
+  const decision = decideAdminAccess({ enabled, email: session?.user?.email });
+
+  if (!decision.ok) {
+    if (decision.status === 403) {
+      // Almost always a revoked address still holding a valid cookie. Worth a
+      // line in the log, since the alternative reading is a misconfiguration.
+      console.warn("Admin route refused a session outside the allowlist", {
+        email: session?.user?.email,
+      });
+    }
+
+    res.status(decision.status).json({ error: decision.error });
     return false;
   }
 
-  // TODO(auth): no caller identity is established here. See the file header.
+  return isSameSiteWrite(req, res);
+}
+
+/**
+ * Refuses a cross-site write.
+ *
+ * The session cookie is SameSite=Lax, so a browser already declines to attach
+ * it to a cross-site POST, PATCH or DELETE. This is the same rule stated a
+ * second time, close to the thing it protects. A request without the header at
+ * all — curl, an old browser — is allowed through, so nothing legitimate
+ * breaks; the header is only ever used to reject.
+ */
+function isSameSiteWrite(req: NextApiRequest, res: NextApiResponse): boolean {
+  if (!req.method || req.method === "GET" || req.method === "HEAD") return true;
+
+  const site = req.headers["sec-fetch-site"];
+
+  if (typeof site === "string" && site !== "same-origin") {
+    res.status(403).json({ error: "Requisição de origem não permitida" });
+    return false;
+  }
+
   return true;
 }
 
@@ -73,18 +122,23 @@ export function withAdminRoute(handlers: MethodHandlers): NextApiHandler {
     // these may be cached by the CDN or the browser.
     res.setHeader("Cache-Control", "no-store");
 
-    if (!requireAdmin(req, res)) return;
-
-    const handler = req.method ? handlers[req.method] : undefined;
-
-    if (!handler) {
-      res.setHeader("Allow", allowed.join(", "));
-      return res
-        .status(405)
-        .json({ error: `Método ${req.method} não permitido` });
-    }
-
     try {
+      // Inside the try, unlike when this guard was synchronous: it now awaits a
+      // session, and a rejection there (a malformed secret, a corrupt cookie)
+      // would otherwise escape as an unhandled rejection and be answered by
+      // Next itself, bypassing sendError and its rule that internal details
+      // never reach the client.
+      if (!(await requireAdmin(req, res))) return;
+
+      const handler = req.method ? handlers[req.method] : undefined;
+
+      if (!handler) {
+        res.setHeader("Allow", allowed.join(", "));
+        return res
+          .status(405)
+          .json({ error: `Método ${req.method} não permitido` });
+      }
+
       return await handler(req, res);
     } catch (error) {
       return sendError(res, error);
