@@ -17,6 +17,9 @@ type TextSettingsDropdownProps = {
   canDownloadMp3?: boolean;
   onChangeFontSize: (size: number) => void;
   onCopyLyrics: () => void;
+  offlineSaved: boolean;
+  offlineSaving: boolean;
+  onToggleOffline: () => void;
 };
 
 export default function TextSettingsDropdown({
@@ -29,6 +32,9 @@ export default function TextSettingsDropdown({
   canDownloadMp3 = true,
   onChangeFontSize,
   onCopyLyrics,
+  offlineSaved,
+  offlineSaving,
+  onToggleOffline,
 }: TextSettingsDropdownProps) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -123,6 +129,26 @@ export default function TextSettingsDropdown({
               }}
             />
           </div>
+
+          <div className="border-t border-gray-700 my-2" />
+
+          <div className="py-1 text-xs uppercase text-gray-200">
+            Disponível offline
+          </div>
+
+          <label className="relative inline-flex items-center cursor-pointer gap-2">
+            <input
+              type="checkbox"
+              checked={offlineSaved || offlineSaving}
+              onChange={() => onToggleOffline()}
+              className="sr-only peer"
+            />
+            <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:bg-primary transition-all"></div>
+            <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow peer-checked:translate-x-full transition-transform"></div>
+            <span className="text-sm font-medium text-white">
+              {offlineSaving ? "Salvando..." : offlineSaved ? "Sim" : "Não"}
+            </span>
+          </label>
 
           <div className="border-t border-gray-700 my-2" />
 

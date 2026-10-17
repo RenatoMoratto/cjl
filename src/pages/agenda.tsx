@@ -10,7 +10,10 @@ export default function Agenda() {
   useEffect(() => {
     async function fetchEvents() {
       try {
-        const response = await fetch("/api/agenda");
+        // Fails without a network only when nothing is cached
+        const response = await fetch("/api/agenda").catch(() => {
+          throw new Error("Sem conexão");
+        });
         if (!response.ok) {
           throw new Error("Erro ao carregar a agenda");
         }

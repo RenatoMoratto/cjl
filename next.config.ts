@@ -19,6 +19,15 @@ const nextConfig: NextConfig = {
   },
   // Enable compression
   compress: true,
+  // Browsers must always check for a new service worker
+  async headers() {
+    return [
+      {
+        source: "/sw.js",
+        headers: [{ key: "Cache-Control", value: "no-cache" }],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

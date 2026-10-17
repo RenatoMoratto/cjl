@@ -4,14 +4,14 @@ import { useLocalAudioPlayer } from "@/hooks/useLocalAudioPlayer";
 import { CaretLeft } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useState, lazy, Suspense } from "react";
+import { useEffect, useState } from "react";
 import { isVoice, SongDetail } from "@/types";
 import TextSettingsDropdown from "@/components/TextSettingsDropdown";
 import { useCopyToClipboard, useLocalStorage } from "usehooks-ts";
 import { toast } from "react-toastify";
-
-// Lazy load SongPlayer to reduce initial bundle size
-const SongPlayer = lazy(() => import("@/components/SongPlayer"));
+import { useOfflineSong } from "@/hooks/useOfflineSongs";
+// Imported directly (not lazy) so the player is part of the page's cached files offline
+import SongPlayer from "@/components/SongPlayer";
 
 export default function Musica() {
   const params = useParams();
@@ -40,6 +40,11 @@ export default function Musica() {
   const track = song?.tracks.find((item) => item.voice === voice);
   const isTrackUnavailable = Boolean(song) && !track;
 
+  const { isAvailableOffline, isSaving, toggleOffline } = useOfflineSong(
+    song,
+    voice,
+  );
+
   const {
     volume,
     currentTime,
@@ -62,7 +67,10 @@ export default function Musica() {
       try {
         setLoading(true);
 
-        const response = await fetch(`/api/musicas/${songId}`);
+        // Fails without a network only when the song isn't saved offline
+        const response = await fetch(`/api/musicas/${songId}`).catch(() => {
+          throw new Error("Música não disponível offline");
+        });
         if (!response.ok) {
           throw new Error("Música não encontrada");
         }
@@ -142,6 +150,9 @@ export default function Musica() {
                   canDownloadMp3={Boolean(track) && !isDownloading}
                   onChangeFontSize={(size) => setFontSize(size)}
                   onCopyLyrics={handleCopyLyric}
+                  offlineSaved={isAvailableOffline}
+                  offlineSaving={isSaving}
+                  onToggleOffline={toggleOffline}
                 />
               </div>
             </div>
@@ -162,6 +173,12 @@ export default function Musica() {
             </div>
           )}
 
+          {track && !isAvailableOffline && !navigator.onLine && (
+            <p className="text-center text-red-500">
+              Áudio não disponível offline
+            </p>
+          )}
+
           {song && (
             <TextReader
               lyrics={song.lyrics}
@@ -176,25 +193,17 @@ export default function Musica() {
 
         {!isTrackUnavailable && (
           <div className="w-full p-5 rounded-3xl bg-gray-800">
-            <Suspense
-              fallback={
-                <div className="text-center text-gray-50">
-                  Carregando player...
-                </div>
-              }
-            >
-              <SongPlayer
-                currentTime={currentTime}
-                duration={duration}
-                isPlaying={isPlaying}
-                togglePlay={togglePlay}
-                isReplayEnabled={isReplayEnabled}
-                toggleReplay={toggleReplay}
-                handleSeek={handleSeek}
-                volume={volume}
-                handleVolumeChange={handleVolumeChange}
-              />
-            </Suspense>
+            <SongPlayer
+              currentTime={currentTime}
+              duration={duration}
+              isPlaying={isPlaying}
+              togglePlay={togglePlay}
+              isReplayEnabled={isReplayEnabled}
+              toggleReplay={toggleReplay}
+              handleSeek={handleSeek}
+              volume={volume}
+              handleVolumeChange={handleVolumeChange}
+            />
           </div>
         )}
       </div>
