@@ -25,17 +25,23 @@ import { Status, type SongDetail, type SongSummary } from "@/types";
  */
 
 export async function listActiveSongs(): Promise<SongSummary[]> {
-  return db
-    .select({
-      id: songs.id,
-      slug: songs.slug,
-      title: songs.title,
-      author: songs.author,
-      imageUrl: songs.imageUrl,
-    })
-    .from(songs)
-    .where(eq(songs.status, Status.active))
-    .orderBy(asc(songs.position), asc(songs.id));
+  const rows = await db.query.songs.findMany({
+    columns: {
+      id: true,
+      slug: true,
+      title: true,
+      author: true,
+      imageUrl: true,
+    },
+    where: eq(songs.status, Status.active),
+    with: { tracks: { columns: { voice: true } } },
+    orderBy: [asc(songs.position), asc(songs.id)],
+  });
+
+  return rows.map(({ tracks, ...song }) => ({
+    ...song,
+    voices: tracks.map((track) => track.voice),
+  }));
 }
 
 /**

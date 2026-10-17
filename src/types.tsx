@@ -46,10 +46,12 @@ export interface SongSummary {
   title: string;
   author: string;
   imageUrl: string;
+  /** Voices that have a kit, so each voice list only shows playable songs. */
+  voices: Voice[];
 }
 
 /** Shape returned by /api/musicas/[id] — adds lyrics and the available kits. */
-export interface SongDetail extends SongSummary {
+export interface SongDetail extends Omit<SongSummary, "voices"> {
   status: Status;
   lyrics: Lyrics;
   tracks: SongTrack[];
