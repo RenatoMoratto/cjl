@@ -4,7 +4,7 @@ import { Event } from "@/types";
 import { toast } from "react-toastify";
 
 export default function Agenda() {
-  const [events, setEvents] = useState<Event[]>([]);
+  const [events, setEvents] = useState<Event[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -35,10 +35,15 @@ export default function Agenda() {
 
         {loading && <p className="text-gray-50">Carregando...</p>}
 
+        {events?.length === 0 && (
+          <p className="text-gray-50">Nenhum evento agendado</p>
+        )}
+
         {!loading && (
           <div className="flex flex-col gap-4 w-full overflow-auto">
-            {events.map((program) => {
-              const eventDate = new Date(program.date + " 00:00:00");
+            {events?.map((program) => {
+              // "YYYY-MM-DD", already zero-padded; a Date would add a time zone
+              const [, month, day] = program.date.split("-");
 
               return (
                 <div
@@ -46,15 +51,16 @@ export default function Agenda() {
                   className="flex rounded-xl w-full bg-gray-700"
                 >
                   <div className="flex flex-col p-2 text-4xl">
-                    <p>{eventDate.getDate().toString().padStart(2, "0")}</p>
+                    <p>{day}</p>
                     <hr className="border-t-2" />
-                    <p>
-                      {(eventDate.getMonth() + 1).toString().padStart(2, "0")}
-                    </p>
+                    <p>{month}</p>
                   </div>
                   <div className="flex flex-col p-2">
                     <h3 className="font-bold text-xl">{program.title}</h3>
-                    <p className="text-xs text-gray-50">{program.location}</p>
+                    <p className="text-xs text-gray-50">
+                      {program.time && `${program.time} · `}
+                      {program.location}
+                    </p>
                   </div>
                 </div>
               );

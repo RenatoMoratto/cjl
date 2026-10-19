@@ -63,6 +63,10 @@ POST   /api/admin/songs/reorder     rewrite the public list order
 POST   /api/admin/tracks/upload-url step 1 — presign an upload
 POST   /api/admin/tracks            step 3 — persist the uploaded kit
 DELETE /api/admin/tracks/:id        remove one voice kit
+GET    /api/admin/agenda            every event, past ones included
+POST   /api/admin/agenda            create an event
+PATCH  /api/admin/agenda/:id        update an event
+DELETE /api/admin/agenda/:id        delete an event
 ```
 
 ### Admin UI
@@ -74,6 +78,7 @@ DELETE /api/admin/tracks/:id        remove one voice kit
 | `/admin/musicas/nova`      | Create a song                                   |
 | `/admin/musicas/:id`       | Metadata and the five voice-kit slots           |
 | `/admin/musicas/:id/letra` | Time the lyric against the song's own recording |
+| `/admin/agenda`            | Agenda: create, edit and delete events          |
 
 **Ordering** is edited with the arrow buttons (or `Alt+↑`/`Alt+↓`) and saved
 explicitly. The request always carries _every_ song id in its new order, never
@@ -212,6 +217,27 @@ The migration in `drizzle/0001_*.sql` adds `songs.position` (explicit list
 ordering, backfilled from the id) and the `pending_object_deletions` table.
 Apply it with `npm run db:migrate` before running this code; the public
 `/api/musicas` endpoint orders by `position` and will fail until it is applied.
+
+### Agenda
+
+The agenda lives in the `agenda_events` table (`drizzle/0002_*.sql`). Dates and
+times are Londrina wall-clock strings with no time zone, and the public
+`/api/agenda` lists events from today in `America/Sao_Paulo` onwards, so an
+evening rehearsal stays listed until midnight here rather than 21:00 UTC.
+
+`/api/agenda` keeps the `{ events: [...] }` response it had when it read
+`json/agenda.json`. The service worker serves cached copies of it offline, so
+fields may be added (`time` was) but never renamed or removed.
+
+Moving it off the JSON file, in this order:
+
+1. `npm run db:migrate`
+2. `npx tsx scripts/seed-agenda.ts` — copies `json/agenda.json` with new ids;
+   it refuses to run on a table that already has rows
+3. deploy
+
+The public endpoint fails until steps 1 and 2 are done. Once the seeded agenda
+is confirmed in production, `json/agenda.json` and the seed script can go.
 
 ## Learn More
 

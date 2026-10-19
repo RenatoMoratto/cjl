@@ -1,31 +1,32 @@
-import path from "path";
-import { promises as fs } from "fs";
 import { NextApiRequest, NextApiResponse } from "next";
+
+import { setPublicAgendaCacheHeaders } from "@/lib/cache";
+import { listUpcomingEvents } from "@/services/agenda";
 import { Agenda } from "@/types";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Agenda | { error: string }>,
 ) {
+  if (req.method !== "GET") {
+    res.setHeader("Allow", "GET");
+    return res
+      .status(405)
+      .json({ error: `Método ${req.method} não permitido` });
+  }
+
   try {
-    const jsonDirectory = path.join(process.cwd(), "json");
-    const fileContents = await fs.readFile(
-      path.join(jsonDirectory, "agenda.json"),
-      "utf8",
-    );
+    const events = await listUpcomingEvents();
 
-    const data: Agenda = JSON.parse(fileContents);
-    const today = new Date();
+    // Served from Vercel's CDN, which also hides Neon's cold start. Tagged so
+    // any agenda mutation can purge it on demand — see src/lib/cache.
+    setPublicAgendaCacheHeaders(res);
 
-    today.setHours(0, 0, 0, 0);
-
-    const futureEvents = data.events.filter((event) => {
-      const eventDate = new Date(event.date);
-      return eventDate >= today;
-    });
-
-    res.status(200).json({ events: futureEvents });
+    // Keep the { events } envelope: the service worker serves cached copies of
+    // this response offline, so its shape may only ever grow.
+    return res.status(200).json({ events });
   } catch (error) {
-    res.status(500).json({ error: `Failed to read agenda.json: ${error}` });
+    console.error("Failed to list the agenda", error);
+    return res.status(500).json({ error: "Erro ao carregar a agenda" });
   }
 }

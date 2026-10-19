@@ -2,6 +2,10 @@ import type { ApiError as ApiErrorBody } from "@/lib/api/admin";
 import type { z } from "zod";
 
 import type {
+  createAgendaEventSchema,
+  UpdateAgendaEventInput,
+} from "@/lib/validation/agenda";
+import type {
   ConfirmTrackUploadInput,
   createSongSchema,
   CreateUploadUrlInput,
@@ -15,7 +19,7 @@ import type {
   DeleteTrackResult,
   PreparedTrackUpload,
 } from "@/services/tracks";
-import type { SongDetail } from "@/types";
+import type { Event as AgendaEvent, SongDetail } from "@/types";
 
 /**
  * The browser's side of /api/admin.
@@ -157,6 +161,9 @@ export type ManagedSongResponse = Omit<ManagedSong, "updatedAt"> & {
  */
 export type CreateSongPayload = z.input<typeof createSongSchema>;
 
+/** Same reasoning: `time` and `location` default on the server. */
+export type CreateAgendaEventPayload = z.input<typeof createAgendaEventSchema>;
+
 export const adminApi = {
   listSongs: () => apiFetch<ManagedSongResponse[]>("/api/admin/songs"),
 
@@ -201,4 +208,18 @@ export const adminApi = {
     apiFetch<DeleteTrackResult>(`/api/admin/tracks/${id}`, {
       method: "DELETE",
     }),
+
+  listEvents: () => apiFetch<AgendaEvent[]>("/api/admin/agenda"),
+
+  createEvent: (input: CreateAgendaEventPayload) =>
+    apiFetch<AgendaEvent>("/api/admin/agenda", { method: "POST", json: input }),
+
+  updateEvent: (id: number, input: UpdateAgendaEventInput) =>
+    apiFetch<AgendaEvent>(`/api/admin/agenda/${id}`, {
+      method: "PATCH",
+      json: input,
+    }),
+
+  deleteEvent: (id: number) =>
+    apiFetch<{ id: number }>(`/api/admin/agenda/${id}`, { method: "DELETE" }),
 };

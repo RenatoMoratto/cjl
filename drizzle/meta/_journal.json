@@ -15,6 +15,13 @@
       "when": 1786220013846,
       "tag": "0001_warm_forgotten_one",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792285488673,
+      "tag": "0002_harsh_nitro",
+      "breakpoints": true
     }
   ]
 }

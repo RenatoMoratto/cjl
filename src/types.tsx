@@ -10,7 +10,13 @@ export interface Lyrics {
 
 export interface Event {
   id: number;
+  /** "YYYY-MM-DD", in Londrina. */
   date: string;
+  /**
+   * "HH:MM", or null when unset. Absent from responses cached before the field
+   * existed, which the service worker can still serve offline.
+   */
+  time?: string | null;
   title: string;
   location: string;
 }
