@@ -1,6 +1,7 @@
 import { SignOut } from "@phosphor-icons/react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { signOut } from "next-auth/react";
 import type { ReactNode } from "react";
 import { useDocumentTitle } from "usehooks-ts";
@@ -18,6 +19,11 @@ import type { AdminIdentity } from "@/lib/auth/page";
  * deliberately identical; only the width and the header differ.
  */
 
+const SECTIONS = [
+  { title: "Músicas", href: "/admin" },
+  { title: "Agenda", href: "/admin/agenda" },
+];
+
 interface AdminLayoutProps {
   admin: AdminIdentity;
   title: string;
@@ -28,6 +34,8 @@ interface AdminLayoutProps {
 
 function AdminLayout({ admin, title, actions, children }: AdminLayoutProps) {
   useDocumentTitle(`${title} | Admin CJL`);
+  const { pathname } = useRouter();
+  const isAgenda = pathname.startsWith("/admin/agenda");
 
   return (
     <div className="min-h-dvh bg-[url(/images/coral.webp)] bg-no-repeat bg-cover bg-center bg-fixed">
@@ -35,19 +43,44 @@ function AdminLayout({ admin, title, actions, children }: AdminLayoutProps) {
         <div className="max-w-6xl w-full container">
           <div className="w-full p-5 flex flex-col gap-5">
             <header className="w-full flex flex-wrap items-center justify-between gap-3">
-              <Link href="/admin" className="flex items-center gap-3">
-                <Image
-                  src="/images/logo-branca.webp"
-                  alt="Logo do Coral Jovem de Londrina"
-                  className="w-auto"
-                  style={{ height: "28px" }}
-                  width={78}
-                  height={28}
-                />
-                <span className="text-sm font-medium text-gray-300">
-                  Administração
-                </span>
-              </Link>
+              <div className="flex flex-wrap items-center gap-4">
+                <Link href="/admin" className="flex items-center gap-3">
+                  <Image
+                    src="/images/logo-branca.webp"
+                    alt="Logo do Coral Jovem de Londrina"
+                    className="w-auto"
+                    style={{ height: "28px" }}
+                    width={78}
+                    height={28}
+                  />
+                  <span className="text-sm font-medium text-gray-300">
+                    Administração
+                  </span>
+                </Link>
+
+                <nav className="flex items-center gap-1">
+                  {SECTIONS.map((section) => {
+                    // Everything that is not the agenda is the song section.
+                    const active =
+                      section.href === "/admin/agenda" ? isAgenda : !isAgenda;
+
+                    return (
+                      <Link
+                        key={section.href}
+                        href={section.href}
+                        aria-current={active ? "page" : undefined}
+                        className={`rounded-xl px-3 py-2 text-sm transition ${
+                          active
+                            ? "bg-gray-800/80 text-gray-50"
+                            : "text-gray-300 hover:bg-gray-800/60 hover:text-gray-50"
+                        }`}
+                      >
+                        {section.title}
+                      </Link>
+                    );
+                  })}
+                </nav>
+              </div>
 
               <div className="flex items-center gap-3">
                 <span

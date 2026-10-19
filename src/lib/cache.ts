@@ -2,9 +2,10 @@ import { invalidateByTag } from "@vercel/functions";
 import type { NextApiResponse } from "next";
 
 /**
- * Cache control for the public song endpoints, and the matching invalidation.
+ * Cache control for the public song and agenda endpoints, and the matching
+ * invalidation.
  *
- * /api/musicas and /api/musicas/[id] are served from Vercel's CDN, which is
+ * /api/musicas, /api/musicas/[id] and /api/agenda are served from Vercel's CDN, which is
  * what hides Neon's cold start from choristers. That cache is also why a
  * mutation is not finished when the database commits: until the edge is told
  * otherwise it keeps serving the previous list for up to s-maxage seconds.
@@ -56,12 +57,33 @@ export async function invalidatePublicSongCache(
     ? [SONGS_CACHE_TAG, songCacheTag(songId)]
     : [SONGS_CACHE_TAG];
 
+  await invalidateTags(tags, "song");
+}
+
+/** Applied to the public agenda — invalidated by any agenda mutation. */
+export const AGENDA_CACHE_TAG = "agenda";
+
+/** Same policy as the songs; see setPublicSongCacheHeaders. */
+export function setPublicAgendaCacheHeaders(res: NextApiResponse): void {
+  res.setHeader("Cache-Control", CACHE_CONTROL);
+  res.setHeader("Vercel-Cache-Tag", AGENDA_CACHE_TAG);
+}
+
+/**
+ * Marks the public agenda stale after a successful mutation. Never throws, for
+ * the same reason as invalidatePublicSongCache.
+ */
+export async function invalidatePublicAgendaCache(): Promise<void> {
+  await invalidateTags([AGENDA_CACHE_TAG], "agenda");
+}
+
+async function invalidateTags(tags: string[], label: string): Promise<void> {
   if (!process.env.VERCEL) return;
 
   try {
     await invalidateByTag(tags);
   } catch (error) {
-    console.error("Failed to invalidate the public song cache", {
+    console.error(`Failed to invalidate the public ${label} cache`, {
       tags,
       error,
     });

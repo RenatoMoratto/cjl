@@ -1,11 +1,13 @@
 import { relations } from "drizzle-orm";
 import {
+  date,
   index,
   integer,
   jsonb,
   pgEnum,
   pgTable,
   text,
+  time,
   timestamp,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
@@ -115,6 +117,33 @@ export const pendingObjectDeletions = pgTable(
       table.purgeAfter,
     ),
   ],
+);
+
+/**
+ * The public agenda: rehearsals, presentations and days off.
+ *
+ * `date` and `time` are Londrina wall-clock values with no time zone on
+ * purpose. An event on the 4th at 19:30 is that wherever the server runs, and
+ * the public list compares `date` against today in America/Sao_Paulo.
+ */
+export const agendaEvents = pgTable(
+  "agenda_events",
+  {
+    id: integer().primaryKey().generatedByDefaultAsIdentity(),
+    /** Read back as "YYYY-MM-DD", never as a Date that could shift a day. */
+    date: date().notNull(),
+    /** Optional: most events keep the usual rehearsal time. */
+    time: time(),
+    title: text().notNull(),
+    location: text().notNull().default(""),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [index("agenda_events_date_idx").on(table.date, table.time)],
 );
 
 export const songsRelations = relations(songs, ({ many }) => ({
