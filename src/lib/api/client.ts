@@ -13,7 +13,11 @@ import type {
 } from "@/lib/validation/songs";
 // Type-only, and it must stay that way: a value import of these modules would
 // pull drizzle, the S3 client and the Neon driver into the browser bundle.
-import type { DeleteSongResult, ManagedSong } from "@/services/songs";
+import type {
+  DeleteSongResult,
+  ManagedSong,
+  ManagedSongDetail,
+} from "@/services/songs";
 import type {
   ConfirmedTrack,
   DeleteTrackResult,
@@ -167,7 +171,8 @@ export type CreateAgendaEventPayload = z.input<typeof createAgendaEventSchema>;
 export const adminApi = {
   listSongs: () => apiFetch<ManagedSongResponse[]>("/api/admin/songs"),
 
-  getSong: (id: number) => apiFetch<SongDetail>(`/api/admin/songs/${id}`),
+  getSong: (id: number) =>
+    apiFetch<ManagedSongDetail>(`/api/admin/songs/${id}`),
 
   createSong: (input: CreateSongPayload) =>
     apiFetch<SongDetail>("/api/admin/songs", { method: "POST", json: input }),

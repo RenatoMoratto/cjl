@@ -4,15 +4,25 @@ import { CaretLeft, CloudCheck } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { SongSummary } from "@/types";
-import { useEffect, useState } from "react";
+import useSWR from "swr";
 import { toast } from "react-toastify";
 import { useOfflineSongs } from "@/hooks/useOfflineSongs";
+import { FetchError } from "@/lib/fetcher";
+
+const NO_SONGS: SongSummary[] = [];
 
 export default function Songs() {
   const params = useParams();
 
-  const [songs, setSongs] = useState<Array<SongSummary>>([]);
-  const [loading, setLoading] = useState(true);
+  // One cache entry for every voice, so switching voices or coming back from
+  // a song shows the list at once while it is reloaded
+  const { data: songs = NO_SONGS, isLoading: loading } = useSWR<
+    SongSummary[],
+    FetchError
+  >("/api/musicas", {
+    onError: (error) =>
+      toast.error(error.offline ? "Sem conexão" : "Músicas não encontradas"),
+  });
 
   const voice = params?.voz ?? "";
 
@@ -21,34 +31,12 @@ export default function Songs() {
   const formattedVoice =
     voice?.at(0)?.toUpperCase() + voice?.toString().substring(1);
 
-  useEffect(() => {
-    const fetchSongs = async () => {
-      try {
-        setLoading(true);
-
-        // Fails without a network only when nothing is cached
-        const response = await fetch(`/api/musicas`).catch(() => {
-          throw new Error("Sem conexão");
-        });
-
-        if (!response.ok) {
-          throw new Error("Músicas não encontradas");
-        }
-
-        const data: Array<SongSummary> = await response.json();
-        setSongs(data);
-      } catch (error) {
-        toast.error((error as Error).message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSongs();
-  }, []);
-
   return (
-    <Layout submenu title={`Músicas ${formattedVoice} | CJL`}>
+    <Layout
+      submenu
+      // The prerendered page is shared by every voice, so it has none yet
+      title={voice ? `Músicas ${formattedVoice} | CJL` : "Músicas | CJL"}
+    >
       <div className="h-full w-full content-center">
         <div className="h-full w-full p-5 flex flex-col rounded-3xl bg-gray-800">
           <div className="w-full grid place-items-center mb-4">

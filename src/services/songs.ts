@@ -12,7 +12,12 @@ import type {
 } from "@/lib/validation/songs";
 import { isUniqueViolation, ServiceError } from "@/services/errors";
 import { enqueueObjectDeletion } from "@/services/storage-cleanup";
-import { Status, type SongDetail, type SongSummary } from "@/types";
+import {
+  Status,
+  type SongDetail,
+  type SongSummary,
+  type SongTrack,
+} from "@/types";
 
 /**
  * Data access for songs. API routes and, later, the authenticated management
@@ -71,6 +76,38 @@ export async function getSongById(id: number): Promise<SongDetail | null> {
       .map((track) => ({
         voice: track.voice,
         url: buildAudioUrl(track.objectKey),
+      }))
+      .sort((a, b) => a.voice.localeCompare(b.voice)),
+  };
+}
+
+export interface ManagedSongDetail extends SongDetail {
+  tracks: Array<SongTrack & { id: number; objectKey: string }>;
+}
+
+/**
+ * One song for the admin editor: the public detail plus each track's id and
+ * object key, which deleting or replacing a kit needs. The audio URL is still
+ * composed here, so the browser never has to know the public host.
+ */
+export async function getSongForManagement(
+  id: number,
+): Promise<ManagedSongDetail | null> {
+  const song = await db.query.songs.findFirst({
+    where: eq(songs.id, id),
+    with: { tracks: true },
+  });
+
+  if (!song) return null;
+
+  return {
+    ...toSongDetail(song, []),
+    tracks: song.tracks
+      .map((track) => ({
+        id: track.id,
+        voice: track.voice,
+        url: buildAudioUrl(track.objectKey),
+        objectKey: track.objectKey,
       }))
       .sort((a, b) => a.voice.localeCompare(b.voice)),
   };

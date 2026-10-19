@@ -30,6 +30,13 @@ function readStorage<T>(key: string, fallback: T): T {
   }
 }
 
+// The page already holds the song as /api/musicas/:id returned it, so it is
+// cached as-is rather than requested a second time
+const toLyricsResponse = (song: SongDetail) =>
+  new Response(JSON.stringify(song), {
+    headers: { "Content-Type": "application/json" },
+  });
+
 async function fetchOk(path: string) {
   // cache: "reload" makes the service worker skip the cached copy
   const response = await fetch(path, { cache: "reload" });
@@ -118,12 +125,8 @@ export function useOfflineSong(
       });
 
     const download = async (cache: Cache) => {
-      const [audio, lyrics] = await Promise.all([
-        fetchOk(entry.audioUrl),
-        fetchOk(lyricsPath(entry.id)),
-      ]);
-      await cache.put(entry.audioUrl, audio);
-      await cache.put(lyricsPath(entry.id), lyrics);
+      await cache.put(entry.audioUrl, await fetchOk(entry.audioUrl));
+      await cache.put(lyricsPath(entry.id), toLyricsResponse(song));
     };
 
     const save = async () => {
@@ -132,17 +135,9 @@ export function useOfflineSong(
 
       if (cached) {
         await markAsRecent();
-        if (!navigator.onLine) return;
-        // Pick up lyric syncs; the saved copy stays on failure. Audio needs no
-        // refresh: a replaced kit has a new URL, so it is downloaded as new.
-        try {
-          await cache.put(
-            lyricsPath(entry.id),
-            await fetchOk(lyricsPath(entry.id)),
-          );
-        } catch (error) {
-          console.warn("Falha ao atualizar música offline", error);
-        }
+        // Pick up lyric syncs, from the copy the page just loaded. Audio needs
+        // no refresh: a replaced kit has a new URL, so it is downloaded as new.
+        await cache.put(lyricsPath(entry.id), toLyricsResponse(song));
         return;
       }
 

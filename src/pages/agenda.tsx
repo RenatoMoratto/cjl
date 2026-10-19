@@ -1,32 +1,20 @@
-import { useState, useEffect } from "react";
+import useSWR from "swr";
 import Layout from "@/components/Layout";
-import { Event } from "@/types";
+import { Agenda as AgendaResponse } from "@/types";
 import { toast } from "react-toastify";
+import { FetchError } from "@/lib/fetcher";
 
 export default function Agenda() {
-  const [events, setEvents] = useState<Event[] | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchEvents() {
-      try {
-        // Fails without a network only when nothing is cached
-        const response = await fetch("/api/agenda").catch(() => {
-          throw new Error("Sem conexão");
-        });
-        if (!response.ok) {
-          throw new Error("Erro ao carregar a agenda");
-        }
-        const data = await response.json();
-        setEvents(data.events);
-      } catch (error) {
-        toast.error((error as Error).message);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchEvents();
-  }, []);
+  const { data, isLoading: loading } = useSWR<AgendaResponse, FetchError>(
+    "/api/agenda",
+    {
+      onError: (error) =>
+        toast.error(
+          error.offline ? "Sem conexão" : "Erro ao carregar a agenda",
+        ),
+    },
+  );
+  const events = data?.events;
 
   return (
     <Layout title="Agenda | CJL">

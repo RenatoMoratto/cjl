@@ -23,10 +23,10 @@ import type { Voice } from "@/types";
 
 export interface VoiceSlotData {
   voice: Voice;
-  /** From the management list; needed to delete. */
+  /** Needed to delete. */
   trackId?: number;
   objectKey?: string;
-  /** From the song detail; the only place a playable URL is composed. */
+  /** Composed by the server; the browser never builds an audio URL. */
   url?: string;
 }
 

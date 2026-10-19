@@ -4,25 +4,24 @@ import { useLocalAudioPlayer } from "@/hooks/useLocalAudioPlayer";
 import { CaretLeft } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import useSWR from "swr";
 import { isVoice, SongDetail } from "@/types";
 import TextSettingsDropdown from "@/components/TextSettingsDropdown";
 import { useCopyToClipboard, useLocalStorage } from "usehooks-ts";
 import { toast } from "react-toastify";
 import { useOfflineSong } from "@/hooks/useOfflineSongs";
+import { FetchError } from "@/lib/fetcher";
 // Imported directly (not lazy) so the player is part of the page's cached files offline
 import SongPlayer from "@/components/SongPlayer";
 
 export default function Musica() {
   const params = useParams();
 
-  const [song, setSong] = useState<SongDetail>();
   const [enableReading, setEnableReading] = useLocalStorage(
     "enable-reading",
     true,
   );
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [textAlign, setTextAlign] = useLocalStorage<"left" | "center">(
     "text-align",
     "center",
@@ -34,6 +33,19 @@ export default function Musica() {
   const rawVoice = Array.isArray(params?.voz) ? params.voz[0] : params?.voz;
   const voice = rawVoice && isVoice(rawVoice) ? rawVoice : undefined;
   const songId = Number(params?.musica ?? "");
+
+  // The params are empty until the router is ready, so nothing is fetched yet
+  const { data: song, error: fetchError } = useSWR<SongDetail, FetchError>(
+    songId ? `/api/musicas/${songId}` : null,
+  );
+  const loading = !song && !fetchError;
+  // Fails without a network only when the song isn't saved offline
+  const error =
+    fetchError && !song
+      ? fetchError.offline
+        ? "Música não disponível offline"
+        : "Música não encontrada"
+      : null;
 
   // A song may simply not have a kit for this voice — five of them have no
   // "todos" mix — and the URL segment itself is user-supplied.
@@ -61,33 +73,6 @@ export default function Musica() {
   const formattedVoice = voice
     ? voice.charAt(0).toUpperCase() + voice.slice(1)
     : "";
-
-  useEffect(() => {
-    const fetchMusica = async () => {
-      try {
-        setLoading(true);
-
-        // Fails without a network only when the song isn't saved offline
-        const response = await fetch(`/api/musicas/${songId}`).catch(() => {
-          throw new Error("Música não disponível offline");
-        });
-        if (!response.ok) {
-          throw new Error("Música não encontrada");
-        }
-        const data: SongDetail = await response.json();
-        setSong(data);
-        setError(null);
-      } catch (error) {
-        setError((error as Error).message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (songId) {
-      fetchMusica();
-    }
-  }, [songId]);
 
   // The browser ignores the `download` attribute on cross-origin links, so the
   // file is fetched and re-served as a same-origin blob URL. This depends on
@@ -128,7 +113,7 @@ export default function Musica() {
   };
 
   return (
-    <Layout submenu title={song?.title + " | CJL"}>
+    <Layout submenu title={song ? `${song.title} | CJL` : undefined}>
       <div className="h-full w-full flex flex-col content-center gap-4">
         <div className="h-full w-full p-5 flex flex-col gap-3 rounded-3xl bg-gray-800 overflow-hidden">
           <div className="w-full grid place-items-center">

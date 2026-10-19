@@ -20,11 +20,9 @@ import { VOICES, type SongDetail, type Voice } from "@/types";
 /**
  * Edit a song's metadata and its voice kits.
  *
- * Two endpoints are read, on purpose. GET /api/admin/songs carries each track's
- * id — needed to delete one — but no playable URL; GET /api/admin/songs/:id
- * composes the URLs but drops the ids. Merging them by voice here is cheaper
- * than widening either response, and it keeps the public audio host out of the
- * browser's hands except as an already-composed URL.
+ * GET /api/admin/songs/:id carries everything a slot needs: each track's id,
+ * to delete it, and its already-composed URL, so the public audio host never
+ * has to be known in the browser.
  */
 
 interface LoadedSong {
@@ -52,22 +50,20 @@ export default function EditarMusica({
     setLoadError(null);
 
     try {
-      const [detail, managed] = await Promise.all([
-        adminApi.getSong(songId),
-        adminApi.listSongs(),
-      ]);
-
-      const managedSong = managed.find((song) => song.id === songId);
+      const detail = await adminApi.getSong(songId);
 
       setLoaded({
         detail,
-        slots: VOICES.map((voice) => ({
-          voice,
-          trackId: managedSong?.tracks.find((t) => t.voice === voice)?.id,
-          objectKey: managedSong?.tracks.find((t) => t.voice === voice)
-            ?.objectKey,
-          url: detail.tracks.find((t) => t.voice === voice)?.url,
-        })),
+        slots: VOICES.map((voice) => {
+          const track = detail.tracks.find((t) => t.voice === voice);
+
+          return {
+            voice,
+            trackId: track?.id,
+            objectKey: track?.objectKey,
+            url: track?.url,
+          };
+        }),
       });
     } catch (error) {
       if (isUnauthenticated(error)) {

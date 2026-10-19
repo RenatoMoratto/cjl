@@ -3,11 +3,11 @@ import {
   HouseSimple,
   MicrophoneStage,
 } from "@phosphor-icons/react";
+import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
-import { useDocumentTitle } from "usehooks-ts";
 import CustomToastContainer from "./CustomToastContainer";
 
 const menuItems = [
@@ -27,10 +27,12 @@ function Layout({
 }) {
   const router = useRouter();
 
-  useDocumentTitle(title);
-
   return (
     <div className="h-dvh bg-[url(/images/coral.webp)] bg-no-repeat bg-cover bg-center">
+      {/* In the server HTML too, unlike a title set from an effect */}
+      <Head>
+        <title>{title}</title>
+      </Head>
       <div className="bg-black/60 h-full flex justify-center items-center">
         <div className="max-w-3xl container h-full">
           <div className="w-full h-full p-5 flex flex-col items-center gap-5">

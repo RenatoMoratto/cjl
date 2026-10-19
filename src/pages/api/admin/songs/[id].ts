@@ -2,20 +2,21 @@ import type { NextApiRequest } from "next";
 
 import { parseBody, queryParam, withAdminRoute } from "@/lib/api/admin";
 import { songIdSchema, updateSongSchema } from "@/lib/validation/songs";
-import { deleteSong, getSongById, updateSong } from "@/services/songs";
+import { deleteSong, getSongForManagement, updateSong } from "@/services/songs";
 import { ServiceError } from "@/services/errors";
 
 /**
  * PROTECTED-BY-KILL-SWITCH ONLY — see src/lib/api/admin.ts.
  *
- *   GET    /api/admin/songs/:id — one song, whatever its status
+ *   GET    /api/admin/songs/:id — one song, whatever its status, with track
+ *                                 ids and object keys
  *   PATCH  /api/admin/songs/:id — update metadata (not audio)
  *   DELETE /api/admin/songs/:id — delete the song, its kits and, eventually,
  *                                 the objects behind them
  */
 export default withAdminRoute({
   GET: async (req, res) => {
-    const song = await getSongById(requireId(req));
+    const song = await getSongForManagement(requireId(req));
 
     if (!song) {
       throw new ServiceError("not_found", "Música não encontrada");
