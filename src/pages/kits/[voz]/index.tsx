@@ -81,14 +81,17 @@ export default function Songs() {
                       !savedOffline && !navigator.onLine ? "opacity-50" : ""
                     }
                   >
-                    <div className="bg-gray-700 w-full h-20 rounded-xl flex gap-2">
-                      <Image
-                        src={song.imageUrl}
-                        alt={`Foto da Música ${song.title}`}
-                        width={100}
-                        height={80}
-                        className="rounded-xl h-100 object-cover"
-                      />
+                    <div className="bg-gray-700 w-full min-h-20 rounded-xl flex gap-2">
+                      {/* Fills the row, which grows with the text size */}
+                      <div className="relative w-[100px] shrink-0">
+                        <Image
+                          src={song.imageUrl}
+                          alt={`Foto da Música ${song.title}`}
+                          fill
+                          sizes="100px"
+                          className="rounded-xl object-cover"
+                        />
+                      </div>
                       <div className="flex-1">
                         <p className="text-xl text-gray-50">{song.title}</p>
                         <p className="text-xs text-gray-100 overflow-hidden text-ellipsis">

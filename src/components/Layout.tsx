@@ -37,6 +37,8 @@ function Layout({
       <Head>
         <title>{title}</title>
       </Head>
+      {/* Outside the column, where it would add an empty gap under the logo */}
+      <CustomToastContainer />
       <Image
         src={coral}
         alt=""
@@ -47,7 +49,7 @@ function Layout({
       />
       <div className="relative bg-black/60 h-full flex justify-center items-center">
         <div className="max-w-3xl container h-full">
-          <div className="w-full h-full p-5 flex flex-col items-center gap-5">
+          <div className="w-full h-full p-5 flex flex-col items-center gap-3">
             <header className="w-full flex justify-center">
               <Link href="/">
                 <Image
@@ -61,12 +63,10 @@ function Layout({
               </Link>
             </header>
 
-            <CustomToastContainer />
-
             <main className="flex-1 w-full flex overflow-auto">{children}</main>
 
             {!submenu && (
-              <footer className="w-full bg-gray-900 rounded-3xl flex">
+              <footer className="w-full mt-2 bg-gray-900 rounded-3xl flex">
                 {menuItems.map((item) => {
                   const IconComponent = item.icon;
 
@@ -74,7 +74,7 @@ function Layout({
                     <Link
                       key={item.link}
                       href={item.link}
-                      className={`w-full flex flex-col items-center justify-items-center gap-1 px-4 py-3 ${
+                      className={`w-full flex flex-col items-center justify-items-center gap-1 px-1 py-3 ${
                         router.pathname === item.link ? "active" : ""
                       }`}
                     >

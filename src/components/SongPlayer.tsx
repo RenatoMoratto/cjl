@@ -80,7 +80,7 @@ function SongPlayer({
   const { label: modeLabel, Icon: ModeIcon } = PLAYBACK_MODES[playbackMode];
 
   return (
-    <div className="w-full flex flex-col items-center gap-4">
+    <div className="w-full flex flex-col items-center gap-2">
       {/* Progress Bar */}
       <div className="w-full flex flex-col gap-1">
         <input
@@ -104,8 +104,9 @@ function SongPlayer({
         </div>
       </div>
 
-      {/* Controls */}
-      <div className="flex items-center gap-6">
+      {/* Controls: the icons keep their size, so with a larger text size the
+          gaps narrow (down from 24px) instead of pushing them out of the card */}
+      <div className="w-full max-w-[272px] flex items-center justify-between">
         {/* Playback Mode Button */}
         <button
           onClick={() => setPlaybackMode(nextMode)}
