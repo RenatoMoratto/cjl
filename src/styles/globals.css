@@ -22,3 +22,15 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* The page scales with the device's text size. Chrome follows it through the
+   text-scale meta tag; iOS Safari only exposes Dynamic Type through this
+   system font (the touch-callout check leaves out Safari on macOS, where it
+   is 13px). The body keeps its own font family. */
+@supports (font: -apple-system-body) and (-webkit-touch-callout: none) {
+  html {
+    font: -apple-system-body;
+    /* Tailwind's default, which the shorthand resets */
+    line-height: 1.5;
+  }
+}

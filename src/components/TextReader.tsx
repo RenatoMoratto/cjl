@@ -1,6 +1,10 @@
 import { Lines, Lyrics } from "@/types";
 import { useEffect, useRef } from "react";
 
+// The size setting is in pixels at the usual 16px text size, and is applied
+// relative to the device's text size, so a larger system font enlarges it
+const toEm = (size: number) => `${size / 16}em`;
+
 type TextReaderProps = {
   lyrics: Lyrics;
   currentTime: number;
@@ -22,7 +26,7 @@ function TextReader({
 
   function getLineStyle(line: Lines, isActive: boolean, fontSize: number) {
     const size = line.isSolo ? fontSize * 0.75 : fontSize;
-    return { fontSize: `${size}px` };
+    return { fontSize: toEm(size) };
   }
 
   function getLineClass({
@@ -57,7 +61,7 @@ function TextReader({
   if (lyrics.lines.length === 0) {
     return (
       <div className="text-center">
-        <p className="text-gray-200" style={{ fontSize: `${fontSize}px` }}>
+        <p className="text-gray-200" style={{ fontSize: toEm(fontSize) }}>
           Ainda não temos a letra para esta música...
         </p>
       </div>

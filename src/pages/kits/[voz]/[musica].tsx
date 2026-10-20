@@ -150,7 +150,7 @@ export default function Musica() {
   return (
     <Layout submenu title={song ? `${song.title} | CJL` : undefined}>
       <div className="h-full w-full flex flex-col content-center gap-4">
-        <div className="h-full w-full p-5 flex flex-col gap-3 rounded-3xl bg-gray-800 overflow-hidden">
+        <div className="h-full min-h-0 w-full p-5 flex flex-col gap-3 rounded-3xl bg-gray-800">
           <div className="w-full grid place-items-center">
             <div className="w-full flex items-center justify-between">
               <Link href={voice ? `/kits/${voice}` : "/kits"}>
@@ -167,7 +167,8 @@ export default function Musica() {
                   onToggleReading={() => setEnableReading((prev) => !prev)}
                   onChangeTextAlign={(align) => setTextAlign(align)}
                   onDownloadMp3={handleDownloadMp3}
-                  canDownloadMp3={Boolean(track) && !isDownloading}
+                  canDownloadMp3={Boolean(track)}
+                  downloadingMp3={isDownloading}
                   onChangeFontSize={(size) => setFontSize(size)}
                   onCopyLyrics={handleCopyLyric}
                   offlineSaved={isAvailableOffline}
