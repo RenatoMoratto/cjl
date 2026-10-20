@@ -9,6 +9,10 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
 import CustomToastContainer from "./CustomToastContainer";
+// Static imports get hashed, immutably cached URLs and responsive AVIF sizes
+import coral from "../../public/images/coral.webp";
+import logo from "../../public/images/logo.webp";
+import logoBranca from "../../public/images/logo-branca.webp";
 
 const menuItems = [
   { title: "Home", icon: HouseSimple, link: "/" },
@@ -28,20 +32,26 @@ function Layout({
   const router = useRouter();
 
   return (
-    <div className="h-dvh bg-[url(/images/coral.webp)] bg-no-repeat bg-cover bg-center">
+    <div className="relative h-dvh">
       {/* In the server HTML too, unlike a title set from an effect */}
       <Head>
         <title>{title}</title>
       </Head>
-      <div className="bg-black/60 h-full flex justify-center items-center">
+      <Image
+        src={coral}
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover"
+      />
+      <div className="relative bg-black/60 h-full flex justify-center items-center">
         <div className="max-w-3xl container h-full">
           <div className="w-full h-full p-5 flex flex-col items-center gap-5">
             <header className="w-full flex justify-center">
               <Link href="/">
                 <Image
-                  src={
-                    submenu ? "/images/logo-branca.webp" : "/images/logo.webp"
-                  }
+                  src={submenu ? logoBranca : logo}
                   alt="Logo do Coral Jovem de Londrina"
                   className="w-auto"
                   style={{ height: submenu ? "28px" : "44px" }}
