@@ -4,19 +4,22 @@ import { useLocalAudioPlayer } from "@/hooks/useLocalAudioPlayer";
 import { CaretLeft } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
-import { isVoice, SongDetail } from "@/types";
+import { isVoice, SongDetail, SongSummary } from "@/types";
 import TextSettingsDropdown from "@/components/TextSettingsDropdown";
 import { useCopyToClipboard, useLocalStorage } from "usehooks-ts";
 import { toast } from "react-toastify";
 import { useOfflineSong } from "@/hooks/useOfflineSongs";
 import { FetchError } from "@/lib/fetcher";
+import { songsForVoice } from "@/lib/songs";
 // Imported directly (not lazy) so the player is part of the page's cached files offline
 import SongPlayer from "@/components/SongPlayer";
 
 export default function Musica() {
   const params = useParams();
+  const router = useRouter();
 
   const [enableReading, setEnableReading] = useLocalStorage(
     "enable-reading",
@@ -57,18 +60,50 @@ export default function Musica() {
     voice,
   );
 
+  // The voice's song list, for previous/next. Reuses the list page's copy,
+  // and is only requested when the page was opened directly.
+  const { data: songs } = useSWR<SongSummary[], FetchError>("/api/musicas", {
+    revalidateIfStale: false,
+  });
+  const voiceSongs = songs && voice ? songsForVoice(songs, voice) : [];
+  const songIndex = voiceSongs.findIndex((item) => item.id === songId);
+  const previousSong = songIndex > 0 ? voiceSongs[songIndex - 1] : undefined;
+  const nextSong = songIndex >= 0 ? voiceSongs[songIndex + 1] : undefined;
+
+  // Opened from "Tocar todas" on the list page
+  const isPlayAll = router.query.tocar === "todas";
+  // Whether the song being opened starts playing: skipping keeps playback
+  // going if it was, and a song that ends in "next" mode starts the next one
+  const [autoPlay, setAutoPlay] = useState(false);
+
+  // Replaced rather than pushed, so going back leaves the player instead of
+  // stepping through every song played
+  const goToSong = (target: SongSummary | undefined, play: boolean) => {
+    if (!target || !voice) return;
+    setAutoPlay(play);
+    router.replace(`/kits/${voice}/${target.id}`);
+  };
+
   const {
     volume,
     currentTime,
     duration,
     isPlaying,
-    isReplayEnabled,
+    playbackMode,
     updateCurrentTime,
     togglePlay,
-    toggleReplay,
+    setPlaybackMode,
     handleSeek,
     handleVolumeChange,
-  } = useLocalAudioPlayer(track?.url);
+  } = useLocalAudioPlayer(track?.url, {
+    autoPlay: autoPlay || isPlayAll,
+    // Nothing to do after the last song, so playback stops there
+    onPlayNext: () => goToSong(nextSong, true),
+  });
+
+  useEffect(() => {
+    if (isPlayAll) setPlaybackMode("next");
+  }, [isPlayAll, setPlaybackMode]);
 
   const formattedVoice = voice
     ? voice.charAt(0).toUpperCase() + voice.slice(1)
@@ -183,11 +218,15 @@ export default function Musica() {
               duration={duration}
               isPlaying={isPlaying}
               togglePlay={togglePlay}
-              isReplayEnabled={isReplayEnabled}
-              toggleReplay={toggleReplay}
+              playbackMode={playbackMode}
+              setPlaybackMode={setPlaybackMode}
               handleSeek={handleSeek}
               volume={volume}
               handleVolumeChange={handleVolumeChange}
+              onPrevious={() => goToSong(previousSong, isPlaying)}
+              onNext={() => goToSong(nextSong, isPlaying)}
+              hasPrevious={Boolean(previousSong)}
+              hasNext={Boolean(nextSong)}
             />
           </div>
         )}

@@ -409,8 +409,8 @@ export default function EditarLetra({
                 duration={player.duration}
                 isPlaying={player.isPlaying}
                 togglePlay={player.togglePlay}
-                isReplayEnabled={player.isReplayEnabled}
-                toggleReplay={player.toggleReplay}
+                playbackMode={player.playbackMode}
+                setPlaybackMode={player.setPlaybackMode}
                 handleSeek={player.handleSeek}
                 volume={player.volume}
                 handleVolumeChange={player.handleVolumeChange}

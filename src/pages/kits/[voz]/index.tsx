@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Layout from "@/components/Layout";
-import { CaretLeft, CloudCheck } from "@phosphor-icons/react";
+import { CaretLeft, CloudCheck, PlayCircle } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { SongSummary } from "@/types";
@@ -8,6 +8,7 @@ import useSWR from "swr";
 import { toast } from "react-toastify";
 import { useOfflineSongs } from "@/hooks/useOfflineSongs";
 import { FetchError } from "@/lib/fetcher";
+import { songsForVoice } from "@/lib/songs";
 
 const NO_SONGS: SongSummary[] = [];
 
@@ -25,6 +26,7 @@ export default function Songs() {
   });
 
   const voice = params?.voz ?? "";
+  const voiceSongs = songsForVoice(songs, voice.toString());
 
   const { isSavedOffline } = useOfflineSongs(songs);
 
@@ -47,7 +49,18 @@ export default function Songs() {
               <h2 className="w-full text-center text-3xl font-bold text-gray-50">
                 Músicas
               </h2>
-              <div className="w-[32px]" />
+              {voice && voiceSongs.length > 0 ? (
+                // The song page starts playing and moves on to each next song
+                <Link
+                  href={`/kits/${voice}/${voiceSongs[0].id}?tocar=todas`}
+                  aria-label="Tocar todas"
+                  title="Tocar todas"
+                >
+                  <PlayCircle size={32} weight="bold" />
+                </Link>
+              ) : (
+                <div className="w-[32px]" />
+              )}
             </div>
             <h3 className="text-xl text-gray-100">{formattedVoice}</h3>
           </div>
@@ -55,54 +68,44 @@ export default function Songs() {
             {loading && <p className="text-gray-50">Carregando...</p>}
 
             {!loading &&
-              songs
-                // Hide songs without a kit for this voice (lists cached before
-                // voices were returned have none, so they show everything)
-                .filter(
-                  (song) =>
-                    !song.voices || song.voices.some((item) => item === voice),
-                )
-                .map((song) => {
-                  const savedOffline = isSavedOffline(
-                    song.id,
-                    voice.toString(),
-                  );
+              voiceSongs.map((song) => {
+                const savedOffline = isSavedOffline(song.id, voice.toString());
 
-                  return (
-                    <Link
-                      key={song.id}
-                      href={
-                        voice && song.id ? `/kits/${voice}/${song.id}` : "/kits"
-                      }
-                      className={
-                        !savedOffline && !navigator.onLine ? "opacity-50" : ""
-                      }
-                    >
-                      <div className="bg-gray-700 w-full h-20 rounded-xl flex gap-2">
-                        <Image
-                          src={song.imageUrl}
-                          alt={`Foto da Música ${song.title}`}
-                          width={100}
-                          height={80}
-                          className="rounded-xl h-100 object-cover"
-                        />
-                        <div className="flex-1">
-                          <p className="text-xl text-gray-50">{song.title}</p>
-                          <p className="text-xs text-gray-100 overflow-hidden text-ellipsis">
-                            {song.author}
-                          </p>
-                        </div>
-                        {savedOffline && (
-                          <CloudCheck
-                            size={24}
-                            className="m-3 shrink-0 text-gray-100"
-                            aria-label="Disponível offline"
-                          />
-                        )}
+                return (
+                  <Link
+                    key={song.id}
+                    href={
+                      voice && song.id ? `/kits/${voice}/${song.id}` : "/kits"
+                    }
+                    className={
+                      !savedOffline && !navigator.onLine ? "opacity-50" : ""
+                    }
+                  >
+                    <div className="bg-gray-700 w-full h-20 rounded-xl flex gap-2">
+                      <Image
+                        src={song.imageUrl}
+                        alt={`Foto da Música ${song.title}`}
+                        width={100}
+                        height={80}
+                        className="rounded-xl h-100 object-cover"
+                      />
+                      <div className="flex-1">
+                        <p className="text-xl text-gray-50">{song.title}</p>
+                        <p className="text-xs text-gray-100 overflow-hidden text-ellipsis">
+                          {song.author}
+                        </p>
                       </div>
-                    </Link>
-                  );
-                })}
+                      {savedOffline && (
+                        <CloudCheck
+                          size={24}
+                          className="m-3 shrink-0 text-gray-100"
+                          aria-label="Disponível offline"
+                        />
+                      )}
+                    </div>
+                  </Link>
+                );
+              })}
           </div>
         </div>
       </div>

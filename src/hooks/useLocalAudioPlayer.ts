@@ -1,11 +1,27 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
- * `audioSrc` is optional because the URL now arrives asynchronously from the
- * API. Passing undefined keeps the hook idle instead of constructing an Audio
- * element pointed at a half-built URL.
+ * What happens when a song ends: it starts over, playback stops, or the
+ * caller is asked to move on to the next song (see `onPlayNext`).
  */
-export function useLocalAudioPlayer(audioSrc?: string) {
+export type PlaybackMode = "repeat" | "stop" | "next";
+
+type Options = {
+  /** Starts playing each new `audioSrc` as soon as it is set. */
+  autoPlay?: boolean;
+  /** Called when a song ends in "next" mode. */
+  onPlayNext?: () => void;
+};
+
+/**
+ * `audioSrc` is optional because the URL now arrives asynchronously from the
+ * API. Passing undefined keeps the hook idle instead of pointing the Audio
+ * element at a half-built URL.
+ */
+export function useLocalAudioPlayer(
+  audioSrc?: string,
+  { autoPlay = false, onPlayNext }: Options = {},
+) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
@@ -13,19 +29,24 @@ export function useLocalAudioPlayer(audioSrc?: string) {
   const [currentTime, setCurrentTime] = useState(0);
   const [volume, setVolume] = useState(1); // range de 0 a 1
   const [isMuted, setIsMuted] = useState(false);
-  const [isReplayEnabled, setIsReplayEnabled] = useState(false);
+  const [playbackMode, setPlaybackMode] = useState<PlaybackMode>("stop");
+
+  // Read from the element's listeners, which are added once
+  const playbackModeRef = useRef(playbackMode);
+  playbackModeRef.current = playbackMode;
+  const onPlayNextRef = useRef(onPlayNext);
+  onPlayNextRef.current = onPlayNext;
+  // Read when the source changes, not whenever the flag does
+  const autoPlayRef = useRef(autoPlay);
+  autoPlayRef.current = autoPlay;
 
   const togglePlay = () => {
-    if (!audioRef.current) return;
+    if (!audioRef.current || !audioSrc) return;
     if (isPlaying) {
       audioRef.current.pause();
     } else {
       audioRef.current.play();
     }
-  };
-
-  const toggleReplay = () => {
-    setIsReplayEnabled((prev) => !prev);
   };
 
   const handleSeek = (newTime: number) => {
@@ -74,16 +95,11 @@ export function useLocalAudioPlayer(audioSrc?: string) {
     setIsMuted(audioRef.current.muted);
   };
 
+  // One element for every song, rather than one per source: mobile browsers
+  // only let an element play on its own once the user has started it, so this
+  // is what lets the next song start when one ends
   useEffect(() => {
-    if (!audioSrc) {
-      audioRef.current = null;
-      setIsPlaying(false);
-      setDuration(0);
-      setCurrentTime(0);
-      return;
-    }
-
-    const audio = new Audio(audioSrc);
+    const audio = new Audio();
     audioRef.current = audio;
 
     const onLoadedMetadata = () => {
@@ -96,32 +112,63 @@ export function useLocalAudioPlayer(audioSrc?: string) {
 
     const onPlay = () => setIsPlaying(true);
     const onPause = () => setIsPlaying(false);
-    const onEnded = () => setIsPlaying(false);
+    const onEnded = () => {
+      setIsPlaying(false);
+      if (playbackModeRef.current === "next") onPlayNextRef.current?.();
+    };
+    // A file that fails to load never plays, even if play() was called
+    const onError = () => setIsPlaying(false);
 
     audio.addEventListener("loadedmetadata", onLoadedMetadata);
     audio.addEventListener("timeupdate", onTimeUpdate);
     audio.addEventListener("play", onPlay);
     audio.addEventListener("pause", onPause);
     audio.addEventListener("ended", onEnded);
+    audio.addEventListener("error", onError);
 
     return () => {
       audio.pause();
-      audio.src = "";
-      audio.load();
       audio.removeEventListener("loadedmetadata", onLoadedMetadata);
       audio.removeEventListener("timeupdate", onTimeUpdate);
       audio.removeEventListener("play", onPlay);
       audio.removeEventListener("pause", onPause);
       audio.removeEventListener("ended", onEnded);
+      audio.removeEventListener("error", onError);
+      audio.removeAttribute("src");
+      audio.load();
       audioRef.current = null;
     };
+  }, []);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    audio.pause();
+    setDuration(0);
+    setCurrentTime(0);
+
+    if (!audioSrc) {
+      // Stops downloading the previous song
+      audio.removeAttribute("src");
+      audio.load();
+      return;
+    }
+
+    audio.src = audioSrc;
+
+    if (autoPlayRef.current) {
+      // Rejected when the browser blocks autoplay, the file fails to load or
+      // another song replaces this one first. It then waits for the play button.
+      audio.play().catch(() => {});
+    }
   }, [audioSrc]);
 
   useEffect(() => {
     if (audioRef.current) {
-      audioRef.current.loop = isReplayEnabled;
+      audioRef.current.loop = playbackMode === "repeat";
     }
-  }, [isReplayEnabled]);
+  }, [playbackMode]);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -143,12 +190,12 @@ export function useLocalAudioPlayer(audioSrc?: string) {
     getCurrentTime,
     volume,
     isMuted,
-    isReplayEnabled,
+    playbackMode,
     togglePlay,
     handleSeek,
     handleVolumeChange,
     toggleMute,
-    toggleReplay,
+    setPlaybackMode,
     updateCurrentTime,
   };
 }
