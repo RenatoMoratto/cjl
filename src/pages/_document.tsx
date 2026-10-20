@@ -47,6 +47,12 @@ export default function Document() {
 
         {/* Favicon */}
         <link rel="icon" href="/favicon.ico" />
+
+        {/* Installable app: name, icons and colors are in the manifest */}
+        <link rel="manifest" href="/manifest.webmanifest" />
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+        <meta name="theme-color" content="#111827" />
+        <meta name="apple-mobile-web-app-title" content="CJL" />
       </Head>
       <body className="antialiased">
         <Main />
