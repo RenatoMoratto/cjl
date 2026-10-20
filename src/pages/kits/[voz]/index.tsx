@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Layout from "@/components/Layout";
-import { CaretLeft, CloudCheck } from "@phosphor-icons/react";
+import { CaretLeft, CloudCheck, PlayCircle } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { SongSummary } from "@/types";
@@ -49,7 +49,18 @@ export default function Songs() {
               <h2 className="w-full text-center text-3xl font-bold text-gray-50">
                 Músicas
               </h2>
-              <div className="w-[32px]" />
+              {voice && voiceSongs.length > 0 ? (
+                // The song page starts playing and moves on to each next song
+                <Link
+                  href={`/kits/${voice}/${voiceSongs[0].id}?tocar=todas`}
+                  aria-label="Tocar todas"
+                  title="Tocar todas"
+                >
+                  <PlayCircle size={32} weight="bold" />
+                </Link>
+              ) : (
+                <div className="w-[32px]" />
+              )}
             </div>
             <h3 className="text-xl text-gray-100">{formattedVoice}</h3>
           </div>

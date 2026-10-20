@@ -5,7 +5,7 @@ import { CaretLeft } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { isVoice, SongDetail, SongSummary } from "@/types";
 import TextSettingsDropdown from "@/components/TextSettingsDropdown";
@@ -70,6 +70,8 @@ export default function Musica() {
   const previousSong = songIndex > 0 ? voiceSongs[songIndex - 1] : undefined;
   const nextSong = songIndex >= 0 ? voiceSongs[songIndex + 1] : undefined;
 
+  // Opened from "Tocar todas" on the list page
+  const isPlayAll = router.query.tocar === "todas";
   // Whether the song being opened starts playing: skipping keeps playback
   // going if it was, and a song that ends in "next" mode starts the next one
   const [autoPlay, setAutoPlay] = useState(false);
@@ -94,10 +96,14 @@ export default function Musica() {
     handleSeek,
     handleVolumeChange,
   } = useLocalAudioPlayer(track?.url, {
-    autoPlay,
+    autoPlay: autoPlay || isPlayAll,
     // Nothing to do after the last song, so playback stops there
     onPlayNext: () => goToSong(nextSong, true),
   });
+
+  useEffect(() => {
+    if (isPlayAll) setPlaybackMode("next");
+  }, [isPlayAll, setPlaybackMode]);
 
   const formattedVoice = voice
     ? voice.charAt(0).toUpperCase() + voice.slice(1)
