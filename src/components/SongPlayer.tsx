@@ -1,23 +1,42 @@
 import { useState, useRef } from "react";
 import {
+  type Icon,
   PauseCircle,
   PlayCircle,
+  Queue,
   Repeat,
+  RepeatOnce,
+  SkipBack,
+  SkipForward,
   SpeakerHigh,
   SpeakerLow,
   SpeakerX,
 } from "@phosphor-icons/react";
+import { PlaybackMode } from "@/hooks/useLocalAudioPlayer";
 
 type SongPlayerProps = {
   currentTime: number;
   duration: number;
   isPlaying: boolean;
-  isReplayEnabled: boolean;
+  playbackMode: PlaybackMode;
   volume: number;
   togglePlay: () => void;
-  toggleReplay: () => void;
+  setPlaybackMode: (mode: PlaybackMode) => void;
   handleSeek: (newTime: number) => void;
   handleVolumeChange: (newVolume: number) => void;
+  /** Shows the previous/next buttons, and the "next" playback mode with them. */
+  onPrevious?: () => void;
+  onNext?: () => void;
+  hasPrevious?: boolean;
+  hasNext?: boolean;
+};
+
+// Read like the usual repeat-one / repeat-off / play-queue toggle; "stop" is
+// the gray repeat the old on/off button showed when off
+const PLAYBACK_MODES: Record<PlaybackMode, { label: string; Icon: Icon }> = {
+  repeat: { label: "Repetir a música", Icon: RepeatOnce },
+  stop: { label: "Parar ao terminar", Icon: Repeat },
+  next: { label: "Tocar a próxima", Icon: Queue },
 };
 
 const formatTime = (time: number): string => {
@@ -38,15 +57,27 @@ function SongPlayer({
   currentTime,
   duration,
   isPlaying,
-  isReplayEnabled,
+  playbackMode,
   volume,
   togglePlay,
-  toggleReplay,
+  setPlaybackMode,
   handleSeek,
   handleVolumeChange,
+  onPrevious,
+  onNext,
+  hasPrevious = false,
+  hasNext = false,
 }: SongPlayerProps) {
   const [volumeVisible, setVolumeVisible] = useState(false);
   const volumeRef = useRef<HTMLDivElement>(null);
+
+  const hasNavigation = Boolean(onPrevious && onNext);
+  // Without a song list there is no next song to play
+  const modes: PlaybackMode[] = hasNavigation
+    ? ["repeat", "stop", "next"]
+    : ["repeat", "stop"];
+  const nextMode = modes[(modes.indexOf(playbackMode) + 1) % modes.length];
+  const { label: modeLabel, Icon: ModeIcon } = PLAYBACK_MODES[playbackMode];
 
   return (
     <div className="w-full flex flex-col items-center gap-4">
@@ -75,16 +106,28 @@ function SongPlayer({
 
       {/* Controls */}
       <div className="flex items-center gap-6">
-        {/* Replay Button */}
+        {/* Playback Mode Button */}
         <button
-          onClick={toggleReplay}
+          onClick={() => setPlaybackMode(nextMode)}
           className={`text-2xl ${
-            isReplayEnabled ? "text-primary" : "text-gray-500"
+            playbackMode === "stop" ? "text-gray-500" : "text-primary"
           }`}
-          aria-label={isReplayEnabled ? "Disable replay" : "Enable replay"}
+          aria-label={modeLabel}
+          title={modeLabel}
         >
-          <Repeat weight="bold" size={32} />
+          <ModeIcon weight="bold" size={32} />
         </button>
+
+        {hasNavigation && (
+          <button
+            onClick={onPrevious}
+            disabled={!hasPrevious}
+            className="text-2xl disabled:opacity-30"
+            aria-label="Previous song"
+          >
+            <SkipBack weight="fill" size={32} />
+          </button>
+        )}
 
         {/* Play/Pause Button */}
         <button
@@ -98,6 +141,17 @@ function SongPlayer({
             <PlayCircle weight="bold" size={48} />
           )}
         </button>
+
+        {hasNavigation && (
+          <button
+            onClick={onNext}
+            disabled={!hasNext}
+            className="text-2xl disabled:opacity-30"
+            aria-label="Next song"
+          >
+            <SkipForward weight="fill" size={32} />
+          </button>
+        )}
 
         {/* Volume Control */}
         <div className="relative flex items-center">
