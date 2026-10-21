@@ -1,5 +1,8 @@
 import Layout from "@/components/Layout";
-import TextReader from "@/components/TextReader";
+import TextReader, {
+  DEFAULT_FONT_SIZE,
+  LyricsPlaceholder,
+} from "@/components/TextReader";
 import { useLocalAudioPlayer } from "@/hooks/useLocalAudioPlayer";
 import { CaretLeft } from "@phosphor-icons/react";
 import Link from "next/link";
@@ -12,6 +15,8 @@ import TextSettingsDropdown from "@/components/TextSettingsDropdown";
 import { useCopyToClipboard, useLocalStorage } from "usehooks-ts";
 import { toast } from "react-toastify";
 import { useOfflineSong } from "@/hooks/useOfflineSongs";
+import { useOnline } from "@/hooks/useOnline";
+import LoadError from "@/components/LoadError";
 import { FetchError } from "@/lib/fetcher";
 import { songsForVoice } from "@/lib/songs";
 // Imported directly (not lazy) so the player is part of the page's cached files offline
@@ -29,7 +34,10 @@ export default function Musica() {
     "text-align",
     "center",
   );
-  const [fontSize, setFontSize] = useLocalStorage("font-size", 22);
+  const [fontSize, setFontSize] = useLocalStorage(
+    "font-size",
+    DEFAULT_FONT_SIZE,
+  );
   const [isDownloading, setIsDownloading] = useState(false);
   const [, copyToClipboard] = useCopyToClipboard();
 
@@ -38,17 +46,25 @@ export default function Musica() {
   const songId = Number(params?.musica ?? "");
 
   // The params are empty until the router is ready, so nothing is fetched yet
-  const { data: song, error: fetchError } = useSWR<SongDetail, FetchError>(
-    songId ? `/api/musicas/${songId}` : null,
-  );
+  const {
+    data: song,
+    error: fetchError,
+    isValidating,
+    mutate,
+  } = useSWR<SongDetail, FetchError>(songId ? `/api/musicas/${songId}` : null);
   const loading = !song && !fetchError;
   // Fails without a network only when the song isn't saved offline
   const error =
     fetchError && !song
       ? fetchError.offline
         ? "Música não disponível offline"
-        : "Música não encontrada"
+        : fetchError.status === 404 || fetchError.status === 400
+          ? "Música não encontrada"
+          : "Não foi possível carregar a música."
       : null;
+  // A missing song stays missing; anything else may work a second time
+  const canRetry = Boolean(error) && fetchError?.status !== 404;
+  const online = useOnline();
 
   // A song may simply not have a kit for this voice — five of them have no
   // "todos" mix — and the URL segment itself is user-supplied.
@@ -89,9 +105,13 @@ export default function Musica() {
     currentTime,
     duration,
     isPlaying,
+    isBuffering,
+    hasError: audioError,
+    canSetVolume,
     playbackMode,
     updateCurrentTime,
     togglePlay,
+    retry: retryAudio,
     setPlaybackMode,
     handleSeek,
     handleVolumeChange,
@@ -131,7 +151,8 @@ export default function Musica() {
       downloadLink.download = `${song.title} - ${formattedVoice}.mp3`;
       downloadLink.click();
 
-      URL.revokeObjectURL(objectUrl);
+      // Revoked right after the click, Safari may cancel the download
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 30_000);
       toast.success("Download concluído");
     } catch (error) {
       console.error("Failed to download track", error);
@@ -141,11 +162,22 @@ export default function Musica() {
     }
   };
 
-  const handleCopyLyric = () => {
-    if (!song) return;
+  const hasLyrics = Boolean(song?.lyrics.lines.length);
+
+  const handleCopyLyric = async () => {
+    if (!song || !hasLyrics) return;
     const fullText = song.lyrics.lines.map((line) => line.text).join("\n");
-    copyToClipboard(fullText).then(() => toast.success("Letra copiada"));
+    // Resolves false when the browser refuses, rather than rejecting
+    if (await copyToClipboard(fullText)) {
+      toast.success("Letra copiada");
+    } else {
+      toast.error("Não foi possível copiar a letra");
+    }
   };
+
+  // Offline, a kit that isn't saved fails to load, and retrying can't help
+  const audioUnavailableOffline =
+    Boolean(track) && !isAvailableOffline && !online;
 
   return (
     <Layout submenu title={song ? `${song.title} | CJL` : undefined}>
@@ -153,12 +185,27 @@ export default function Musica() {
         <div className="h-full min-h-0 w-full p-5 flex flex-col gap-3 rounded-3xl bg-gray-800">
           <div className="w-full grid place-items-center">
             <div className="w-full flex items-center justify-between">
-              <Link href={voice ? `/kits/${voice}` : "/kits"}>
+              <Link
+                href={voice ? `/kits/${voice}` : "/kits"}
+                aria-label="Voltar"
+                className="p-2 -m-2"
+              >
                 <CaretLeft size={32} weight="bold" />
               </Link>
-              <h2 className="w-full text-center text-3xl font-bold text-gray-50">
-                {song?.title}
-              </h2>
+              {loading ? (
+                // One line of the title's height, like the lyric's placeholder
+                // (which tells screen readers the page is loading)
+                <div
+                  aria-hidden
+                  className="w-full h-9 text-3xl flex items-center justify-center"
+                >
+                  <div className="h-[0.75em] w-1/2 rounded-full bg-gray-700 animate-pulse" />
+                </div>
+              ) : (
+                <h2 className="w-full text-center text-3xl font-bold text-gray-50">
+                  {song?.title}
+                </h2>
+              )}
               <div className="w-8">
                 <TextSettingsDropdown
                   enableReading={enableReading}
@@ -171,6 +218,7 @@ export default function Musica() {
                   downloadingMp3={isDownloading}
                   onChangeFontSize={(size) => setFontSize(size)}
                   onCopyLyrics={handleCopyLyric}
+                  canCopyLyrics={hasLyrics}
                   offlineSaved={isAvailableOffline}
                   offlineSaving={isSaving}
                   onToggleOffline={toggleOffline}
@@ -182,10 +230,17 @@ export default function Musica() {
             </h3>
           </div>
 
-          {(loading || error || isTrackUnavailable) && (
+          {loading && <LyricsPlaceholder />}
+
+          {(error || isTrackUnavailable) && (
             <div className="text-center">
-              {loading && <p className="text-gray-50">Carregando...</p>}
-              {error && <p className="text-red-500">{error}</p>}
+              {error && (
+                <LoadError
+                  message={error}
+                  onRetry={canRetry ? () => mutate() : undefined}
+                  retrying={isValidating}
+                />
+              )}
               {isTrackUnavailable && (
                 <p className="text-gray-100">
                   Kit de voz indisponível para esta música.
@@ -194,7 +249,8 @@ export default function Musica() {
             </div>
           )}
 
-          {track && !isAvailableOffline && !navigator.onLine && (
+          {/* Before the kit has failed to load; after, the player says it */}
+          {audioUnavailableOffline && !audioError && (
             <p className="text-center text-red-500">
               Áudio não disponível offline
             </p>
@@ -213,11 +269,24 @@ export default function Musica() {
         </div>
 
         {!isTrackUnavailable && (
-          <div className="w-full p-5 rounded-3xl bg-gray-800">
+          <div className="w-full p-5 rounded-3xl bg-gray-800 flex flex-col gap-4">
+            {/* The controls stay, to move on to another song */}
+            {audioError && (
+              <LoadError
+                message={
+                  audioUnavailableOffline
+                    ? "Áudio não disponível offline."
+                    : "Não foi possível carregar o áudio."
+                }
+                onRetry={audioUnavailableOffline ? undefined : retryAudio}
+              />
+            )}
             <SongPlayer
               currentTime={currentTime}
               duration={duration}
               isPlaying={isPlaying}
+              isBuffering={isBuffering}
+              canSetVolume={canSetVolume}
               togglePlay={togglePlay}
               playbackMode={playbackMode}
               setPlaybackMode={setPlaybackMode}

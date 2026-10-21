@@ -8,11 +8,14 @@
 export class FetchError extends Error {
   /** True when the request never reached the server. */
   readonly offline: boolean;
+  /** The response's status, when there was one. */
+  readonly status?: number;
 
-  constructor(offline: boolean, message: string) {
+  constructor(offline: boolean, message: string, status?: number) {
     super(message);
     this.name = "FetchError";
     this.offline = offline;
+    this.status = status;
   }
 }
 
@@ -22,7 +25,11 @@ export async function fetchJson<T>(path: string): Promise<T> {
   });
 
   if (!response.ok) {
-    throw new FetchError(false, `${path} answered ${response.status}`);
+    throw new FetchError(
+      false,
+      `${path} answered ${response.status}`,
+      response.status,
+    );
   }
 
   return response.json();

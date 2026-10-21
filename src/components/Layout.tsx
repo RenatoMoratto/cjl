@@ -66,7 +66,10 @@ function Layout({
             <main className="flex-1 w-full flex overflow-auto">{children}</main>
 
             {!submenu && (
-              <footer className="w-full mt-2 bg-gray-900 rounded-3xl flex">
+              <nav
+                aria-label="Menu principal"
+                className="w-full mt-2 bg-gray-900 rounded-3xl flex"
+              >
                 {menuItems.map((item) => {
                   const IconComponent = item.icon;
 
@@ -74,6 +77,9 @@ function Layout({
                     <Link
                       key={item.link}
                       href={item.link}
+                      aria-current={
+                        router.pathname === item.link ? "page" : undefined
+                      }
                       className={`w-full flex flex-col items-center justify-items-center gap-1 px-1 py-3 ${
                         router.pathname === item.link ? "active" : ""
                       }`}
@@ -94,7 +100,7 @@ function Layout({
                     </Link>
                   );
                 })}
-              </footer>
+              </nav>
             )}
           </div>
         </div>

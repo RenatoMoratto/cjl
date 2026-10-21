@@ -22,6 +22,8 @@ type TextSettingsDropdownProps = {
   downloadingMp3?: boolean;
   onChangeFontSize: (size: number) => void;
   onCopyLyrics: () => void;
+  /** False for a song without lyrics. */
+  canCopyLyrics?: boolean;
   offlineSaved: boolean;
   offlineSaving: boolean;
   onToggleOffline: () => void;
@@ -81,6 +83,7 @@ export default function TextSettingsDropdown({
   downloadingMp3 = false,
   onChangeFontSize,
   onCopyLyrics,
+  canCopyLyrics = true,
   offlineSaved,
   offlineSaving,
   onToggleOffline,
@@ -209,6 +212,7 @@ export default function TextSettingsDropdown({
               setOpen(false);
               onCopyLyrics();
             }}
+            disabled={!canCopyLyrics}
             className={actionClass}
           >
             <Copy size={20} />
