@@ -258,6 +258,8 @@ export default function Musica() {
 
           {song && (
             <TextReader
+              // A new song starts at the top, following its lyric
+              key={song.id}
               lyrics={song.lyrics}
               currentTime={currentTime}
               enableReading={enableReading}

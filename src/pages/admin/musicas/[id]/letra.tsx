@@ -389,7 +389,8 @@ export default function EditarLetra({
               <h2 className="mb-2 text-xs font-medium uppercase tracking-wide text-gray-500">
                 Como o coralista vê
               </h2>
-              <div className="min-h-0 flex-1 overflow-hidden">
+              {/* A column, so the reader shrinks to it and scrolls inside */}
+              <div className="min-h-0 flex-1 flex flex-col">
                 <TextReader
                   lyrics={{ lines }}
                   currentTime={player.currentTime}

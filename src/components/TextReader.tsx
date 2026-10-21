@@ -1,5 +1,6 @@
+import { ArrowDown, ArrowUp } from "@phosphor-icons/react";
 import { Lines, Lyrics } from "@/types";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // The size setting is in pixels at the usual 16px text size, and is applied
 // relative to the device's text size, so a larger system font enlarges it
@@ -51,6 +52,38 @@ type TextReaderProps = {
   fontSize: number;
 };
 
+// Keys that scroll a focused container
+const SCROLL_KEYS = [
+  "ArrowUp",
+  "ArrowDown",
+  "PageUp",
+  "PageDown",
+  "Home",
+  "End",
+  " ",
+];
+
+/**
+ * Brings a line to the middle of the reader. Only the reader scrolls, unlike
+ * scrollIntoView, which would also move the page around it.
+ */
+function scrollToLine(scroller: HTMLElement, line: HTMLElement) {
+  const lineBox = line.getBoundingClientRect();
+  const scrollerBox = scroller.getBoundingClientRect();
+  const reduceMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+
+  scroller.scrollTo({
+    top:
+      scroller.scrollTop +
+      lineBox.top -
+      scrollerBox.top -
+      (scroller.clientHeight - lineBox.height) / 2,
+    behavior: reduceMotion ? "auto" : "smooth",
+  });
+}
+
 function TextReader({
   lyrics,
   currentTime,
@@ -59,7 +92,16 @@ function TextReader({
   textAlign,
   fontSize,
 }: TextReaderProps) {
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
   const activeLineRef = useRef<HTMLParagraphElement | null>(null);
+  // Whether the reader keeps the active line in view. Scrolling by hand
+  // stops it, the sync button starts it again; the highlight follows the
+  // song either way.
+  const [following, setFollowing] = useState(true);
+  // Where the active line is when it's out of view, for the button's arrow
+  const [activeLineOffscreen, setActiveLineOffscreen] = useState<
+    "above" | "below" | null
+  >(null);
 
   function getLineStyle(line: Lines, isActive: boolean, fontSize: number) {
     const size = line.isSolo ? fontSize * 0.75 : fontSize;
@@ -86,7 +128,14 @@ function TextReader({
     return "text-gray-500";
   }
 
+  const hasLines = lyrics.lines.length > 0;
+  // A lyric that was never timed has every line at 0, which would hold the
+  // last line highlighted from the start, so it is shown as plain text
+  const isTimed = lyrics.lines.some((line) => line.time > 0);
+  const syncing = enableReading && isTimed;
+
   const isActiveLine = (index: number) =>
+    syncing &&
     currentTime >= lyrics.lines[index].time &&
     currentTime < (lyrics.lines[index + 1]?.time ?? Infinity);
   // The line the ref ends up on, which is the last active one
@@ -94,18 +143,72 @@ function TextReader({
     isActiveLine(index),
   );
 
-  // Only when the line changes, not on every time update, so the lyric can
-  // be scrolled by hand while a line is being sung
+  // Only when the line changes, not on every time update, and only while
+  // following, so a lyric being browsed by hand stays where it is
   useEffect(() => {
-    if (enableReading && activeLineRef.current) {
-      activeLineRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
+    if (following && scrollerRef.current && activeLineRef.current) {
+      scrollToLine(scrollerRef.current, activeLineRef.current);
     }
-  }, [activeIndex, enableReading]);
+  }, [activeIndex, following]);
 
-  if (lyrics.lines.length === 0) {
+  // Scrolling by hand: wheels and trackpads, touch, the keyboard and the
+  // scrollbar. The reader's own scrolling fires none of these, so it is
+  // never mistaken for the user's.
+  useEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+
+    const stopFollowing = () => setFollowing(false);
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (SCROLL_KEYS.includes(event.key)) stopFollowing();
+    };
+    const handlePointerDown = (event: PointerEvent) => {
+      // On the scrollbar, which is past the content's width
+      if (event.target === scroller && event.offsetX >= scroller.clientWidth) {
+        stopFollowing();
+      }
+    };
+
+    scroller.addEventListener("wheel", stopFollowing, { passive: true });
+    scroller.addEventListener("touchmove", stopFollowing, { passive: true });
+    scroller.addEventListener("keydown", handleKeyDown);
+    scroller.addEventListener("pointerdown", handlePointerDown);
+    return () => {
+      scroller.removeEventListener("wheel", stopFollowing);
+      scroller.removeEventListener("touchmove", stopFollowing);
+      scroller.removeEventListener("keydown", handleKeyDown);
+      scroller.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, [hasLines]);
+
+  // Whether the active line is in view, as it moves on and as the lyric is
+  // scrolled. Before the first line there is nothing to go back to.
+  useEffect(() => {
+    const scroller = scrollerRef.current;
+    const line = activeLineRef.current;
+    if (!scroller || !line) {
+      setActiveLineOffscreen(null);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.intersectionRatio >= 0.5) {
+          setActiveLineOffscreen(null);
+        } else {
+          const top = entry.rootBounds?.top ?? 0;
+          setActiveLineOffscreen(
+            entry.boundingClientRect.top < top ? "above" : "below",
+          );
+        }
+      },
+      { root: scroller, threshold: 0.5 },
+    );
+    observer.observe(line);
+    return () => observer.disconnect();
+  }, [activeIndex]);
+
+  if (!hasLines) {
     return (
       <div className="text-center">
         <p className="text-gray-200" style={{ fontSize: toEm(fontSize) }}>
@@ -115,33 +218,56 @@ function TextReader({
     );
   }
 
-  return (
-    <div
-      className={`px-5 overflow-y-auto ${textAlign === "center" ? "text-center" : "text-left"}`}
-    >
-      <div className="flex flex-col gap-2">
-        {lyrics.lines.map((line, index) => {
-          const isActive = isActiveLine(index);
-          const isPastLine = currentTime < line.time;
+  const SyncIcon = activeLineOffscreen === "above" ? ArrowUp : ArrowDown;
 
-          return (
-            <p
-              key={index}
-              ref={isActive ? activeLineRef : null}
-              onClick={() => updateCurrentTime(line.time)}
-              style={getLineStyle(line, isActive, fontSize)}
-              className={`transition-all duration-400 ${getLineClass({
-                enableReading,
-                isActive,
-                isPastLine,
-                isSolo: line.isSolo,
-              })}`}
-            >
-              {line.isSolo ? `(${line.text})` : line.text}
-            </p>
-          );
-        })}
+  return (
+    // The reader's box, which the sync button floats in. min-h-0 lets it
+    // shrink to the space it's given, so the lyric scrolls inside it.
+    <div className="relative min-h-0 flex flex-col">
+      <div
+        ref={scrollerRef}
+        className={`min-h-0 px-5 overflow-y-auto ${textAlign === "center" ? "text-center" : "text-left"}`}
+      >
+        <div className="flex flex-col gap-2">
+          {lyrics.lines.map((line, index) => {
+            const isActive = isActiveLine(index);
+            const isPastLine = currentTime < line.time;
+
+            return (
+              <p
+                key={index}
+                ref={isActive ? activeLineRef : null}
+                onClick={() => {
+                  // Playing from a line follows the lyric from there
+                  setFollowing(true);
+                  updateCurrentTime(line.time);
+                }}
+                style={getLineStyle(line, isActive, fontSize)}
+                className={`transition-all duration-400 ${getLineClass({
+                  enableReading: syncing,
+                  isActive,
+                  isPastLine,
+                  isSolo: line.isSolo,
+                })}`}
+              >
+                {line.isSolo ? `(${line.text})` : line.text}
+              </p>
+            );
+          })}
+        </div>
       </div>
+
+      {!following && activeLineOffscreen && (
+        <button
+          type="button"
+          // Following again scrolls back to the active line
+          onClick={() => setFollowing(true)}
+          className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2 whitespace-nowrap rounded-full border border-white/25 bg-gray-900/90 px-4 py-2 text-sm font-medium text-white shadow-lg backdrop-blur-sm transition hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+        >
+          <SyncIcon size={16} weight="bold" aria-hidden />
+          Sincronizar letra
+        </button>
+      )}
     </div>
   );
 }
