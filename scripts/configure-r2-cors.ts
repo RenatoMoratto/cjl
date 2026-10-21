@@ -4,10 +4,13 @@
  *
  *   npx tsx scripts/configure-r2-cors.ts
  *
- * Playback does not need CORS — a media element loads cross-origin audio
- * without it. The download button does, because the `download` attribute is
- * ignored on cross-origin links, so the client fetches the file and re-serves
- * it as a same-origin blob URL.
+ * A media element loads cross-origin audio without CORS, but the service
+ * worker fetches songs with it: to save them offline, and to serve the ranges
+ * it streams from the network the way it serves cached ones (see fetchSong in
+ * public/sw.js), which is why content-range is exposed. The download button
+ * needs it too, because the `download` attribute is ignored on cross-origin
+ * links, so the client fetches the file and re-serves it as a same-origin
+ * blob URL.
  *
  * Uploads need it too, and need more of it: the browser PUTs the MP3 straight
  * to R2 with a presigned URL, so the bucket must accept PUT from the site's

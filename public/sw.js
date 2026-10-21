@@ -130,6 +130,28 @@ async function cacheFirst(request) {
   return response;
 }
 
+// A song opened for the first time is saved offline while it plays, so its
+// later ranges (after a seek, or a pause long enough for the browser to drop
+// the download) come from the cache, as responses made here. The browser
+// rejects a file whose ranges come from different origins, and would stop
+// with an error, so ranges from the network are served as responses made here
+// too. That needs R2's CORS policy (scripts/configure-r2-cors.ts); where it is
+// missing songs can't be saved offline either, so the plain request is safe.
+async function fetchSong(request) {
+  const range = request.headers.get("range");
+  let response;
+  try {
+    response = await fetch(request.url, { headers: range ? { range } : {} });
+  } catch {
+    return fetch(request);
+  }
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers,
+  });
+}
+
 // Audio elements request byte ranges (Safari won't play without 206
 // responses), so ranges are sliced from the cached file. Kit URLs are
 // immutable (a replaced kit gets a new URL), so a cached copy never goes stale.
@@ -139,7 +161,7 @@ async function serveSong(request) {
 
   const cache = await caches.open(SONGS_CACHE);
   const cached = await cache.match(request.url);
-  if (!cached) return fetch(request);
+  if (!cached) return fetchSong(request);
 
   const range = /^bytes=(\d*)-(\d*)$/.exec(request.headers.get("range") ?? "");
   if (!range) return cached;
