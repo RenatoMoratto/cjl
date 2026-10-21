@@ -1,3 +1,4 @@
+import InstallApp from "@/components/InstallApp";
 import Layout from "@/components/Layout";
 import {
   InstagramLogo,
@@ -49,6 +50,8 @@ export default function Home() {
             ))}
           </div>
         </div>
+
+        <InstallApp />
       </div>
     </Layout>
   );
