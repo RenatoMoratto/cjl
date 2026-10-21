@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { useEffect } from "react";
 import { SWRConfig } from "swr";
 import { fetchJson } from "@/lib/fetcher";
+import { listenForInstallPrompt } from "@/hooks/useInstallApp";
 
 export default function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
@@ -16,6 +17,9 @@ export default function App({ Component, pageProps }: AppProps) {
         console.error("Service worker registration failed", error),
       );
   }, []);
+
+  // The prompt may fire on any page, before the home page's install button
+  useEffect(() => listenForInstallPrompt(), []);
 
   return (
     <SWRConfig
