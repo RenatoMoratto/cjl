@@ -9,14 +9,17 @@ import Link from "next/link";
 
 const socialMediaLinks = [
   {
+    label: "YouTube",
     icon: YoutubeLogo,
     link: "https://www.youtube.com/@coraljovemdelondrina",
   },
   {
+    label: "Instagram",
     icon: InstagramLogo,
     link: "https://www.instagram.com/coraljovemdelondrina/",
   },
   {
+    label: "WhatsApp",
     icon: WhatsappLogo,
     link: "https://wa.me/5543991956641?text=Olá%2C%20gostaria%20de%20falar%20com%20o%20Coral%20Jovem%20de%20Londrina",
   },
@@ -35,18 +38,25 @@ export default function Home() {
         </p>
 
         <div className="flex flex-col md:flex-row mt-[40px] gap-[10px]">
-          <Link href="/kits">
-            <button className="bg-primary hover:bg-primary text-white py-2 px-8 w-full md:w-max rounded-full">
-              Kits de Voz
-            </button>
+          {/* Links styled as buttons: a button inside a link is two tab stops */}
+          <Link
+            href="/kits"
+            className="bg-primary hover:brightness-110 active:brightness-90 transition text-white text-center py-2 px-8 w-full md:w-max rounded-full"
+          >
+            Kits de Voz
           </Link>
           <div className="flex flex-row justify-center gap-[10px]">
-            {socialMediaLinks.map((socialMedia, index) => (
-              <Link key={index} href={socialMedia.link} target="__blank">
-                <button className="bg-secondary hover:bg-secondary text-white py-2 px-4 w-full md:w-max rounded-full">
-                  <socialMedia.icon size={24} />
-                </button>
-              </Link>
+            {socialMediaLinks.map((socialMedia) => (
+              <a
+                key={socialMedia.label}
+                href={socialMedia.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={socialMedia.label}
+                className="bg-secondary hover:brightness-110 active:brightness-90 transition text-white py-2 px-4 rounded-full flex justify-center"
+              >
+                <socialMedia.icon size={24} />
+              </a>
             ))}
           </div>
         </div>

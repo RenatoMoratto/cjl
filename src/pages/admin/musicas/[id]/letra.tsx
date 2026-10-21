@@ -408,6 +408,8 @@ export default function EditarLetra({
                 currentTime={player.currentTime}
                 duration={player.duration}
                 isPlaying={player.isPlaying}
+                isBuffering={player.isBuffering}
+                canSetVolume={player.canSetVolume}
                 togglePlay={player.togglePlay}
                 playbackMode={player.playbackMode}
                 setPlaybackMode={player.setPlaybackMode}

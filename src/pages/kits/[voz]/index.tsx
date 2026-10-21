@@ -5,8 +5,9 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { SongSummary } from "@/types";
 import useSWR from "swr";
-import { toast } from "react-toastify";
+import LoadError from "@/components/LoadError";
 import { useOfflineSongs } from "@/hooks/useOfflineSongs";
+import { useOnline } from "@/hooks/useOnline";
 import { FetchError } from "@/lib/fetcher";
 import { songsForVoice } from "@/lib/songs";
 
@@ -17,21 +18,25 @@ export default function Songs() {
 
   // One cache entry for every voice, so switching voices or coming back from
   // a song shows the list at once while it is reloaded
-  const { data: songs = NO_SONGS, isLoading: loading } = useSWR<
-    SongSummary[],
-    FetchError
-  >("/api/musicas", {
-    onError: (error) =>
-      toast.error(error.offline ? "Sem conexão" : "Músicas não encontradas"),
-  });
+  const {
+    data,
+    error,
+    isLoading: loading,
+    isValidating,
+    mutate,
+  } = useSWR<SongSummary[], FetchError>("/api/musicas");
+  const songs = data ?? NO_SONGS;
+  const online = useOnline();
 
   const voice = params?.voz ?? "";
   const voiceSongs = songsForVoice(songs, voice.toString());
 
   const { isSavedOffline } = useOfflineSongs(songs);
 
-  const formattedVoice =
-    voice?.at(0)?.toUpperCase() + voice?.toString().substring(1);
+  // Empty in the prerendered page, which has no voice yet
+  const formattedVoice = voice
+    ? voice.at(0)?.toUpperCase() + voice.toString().substring(1)
+    : "";
 
   return (
     <Layout
@@ -43,7 +48,7 @@ export default function Songs() {
         <div className="h-full w-full p-5 flex flex-col rounded-3xl bg-gray-800">
           <div className="w-full grid place-items-center mb-4">
             <div className="w-full flex items-center justify-between">
-              <Link href="/kits">
+              <Link href="/kits" aria-label="Voltar" className="p-2 -m-2">
                 <CaretLeft size={32} weight="bold" />
               </Link>
               <h2 className="w-full text-center text-3xl font-bold text-gray-50">
@@ -62,10 +67,46 @@ export default function Songs() {
                 <div className="w-[32px]" />
               )}
             </div>
-            <h3 className="text-xl text-gray-100">{formattedVoice}</h3>
+            {/* Keeps its line while the voice is unknown */}
+            <h3 className="text-xl text-gray-100 min-h-7">{formattedVoice}</h3>
           </div>
           <div className="w-full flex flex-col gap-3 overflow-y-auto">
-            {loading && <p className="text-gray-50">Carregando...</p>}
+            {/* A retry keeps the error up, with the button saying so */}
+            {loading && !error && (
+              // Rows of the list's own size, so it does not jump when it loads
+              <div role="status" className="flex flex-col gap-3">
+                <span className="sr-only">Carregando...</span>
+                {[0, 1, 2, 3].map((item) => (
+                  <div
+                    key={item}
+                    className="bg-gray-700 w-full min-h-20 rounded-xl animate-pulse"
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Offline, the list is answered from the cache, so this means
+                it was never loaded on this device */}
+            {error && !data && (
+              <div className="py-6">
+                <LoadError
+                  message={
+                    error.offline
+                      ? "Sem conexão. A lista de músicas aparece aqui quando você estiver online."
+                      : "Não foi possível carregar as músicas."
+                  }
+                  onRetry={() => mutate()}
+                  retrying={isValidating}
+                />
+              </div>
+            )}
+
+            {/* Not before the router has the voice */}
+            {data && voice && voiceSongs.length === 0 && (
+              <p className="py-6 text-center text-gray-100">
+                Nenhuma música disponível para esta voz.
+              </p>
+            )}
 
             {!loading &&
               voiceSongs.map((song) => {
@@ -77,16 +118,15 @@ export default function Songs() {
                     href={
                       voice && song.id ? `/kits/${voice}/${song.id}` : "/kits"
                     }
-                    className={
-                      !savedOffline && !navigator.onLine ? "opacity-50" : ""
-                    }
+                    className={!savedOffline && !online ? "opacity-50" : ""}
                   >
                     <div className="bg-gray-700 w-full min-h-20 rounded-xl flex gap-2">
                       {/* Fills the row, which grows with the text size */}
                       <div className="relative w-[100px] shrink-0">
                         <Image
                           src={song.imageUrl}
-                          alt={`Foto da Música ${song.title}`}
+                          // The title is next to it
+                          alt=""
                           fill
                           sizes="100px"
                           className="rounded-xl object-cover"

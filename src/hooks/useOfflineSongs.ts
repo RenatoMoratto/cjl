@@ -1,5 +1,5 @@
 import { SongDetail, SongSummary } from "@/types";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { useLocalStorage } from "usehooks-ts";
 
@@ -92,6 +92,9 @@ export function useOfflineSong(
   const [excluded, setExcluded] = useLocalStorage<string[]>(EXCLUDED_KEY, []);
   const [isSaving, setIsSaving] = useState(false);
   const [saveAttempt, setSaveAttempt] = useState(0);
+  // Set by the switch: songs saved on their own as they are opened report
+  // nothing, a save the user asked for reports how it went
+  const requestedRef = useRef(false);
 
   const track = song?.tracks.find((item) => item.voice === voice);
   const key = song && voice ? songKey(song.id, voice) : "";
@@ -103,6 +106,9 @@ export function useOfflineSong(
   const isSavingNow = isSaving && isOfflineEnabled;
 
   useEffect(() => {
+    const requested = requestedRef.current;
+    requestedRef.current = false;
+
     if (!song || !voice || !track || !isOfflineEnabled || !("caches" in window))
       return;
 
@@ -141,7 +147,10 @@ export function useOfflineSong(
         return;
       }
 
-      if (!navigator.onLine) return;
+      if (!navigator.onLine) {
+        if (requested) toast.error("Sem conexão para salvar a música");
+        return;
+      }
 
       setIsSaving(true);
       try {
@@ -174,10 +183,14 @@ export function useOfflineSong(
 
       await markAsRecent();
       navigator.storage?.persist?.();
+      if (requested) toast.success("Música salva para ouvir sem internet");
     };
 
     save()
-      .catch((error) => console.warn("Falha ao salvar música offline", error))
+      .catch((error) => {
+        console.warn("Falha ao salvar música offline", error);
+        if (requested) toast.error("Não foi possível salvar a música offline");
+      })
       .finally(() => setIsSaving(false));
     // updateOfflineSongs changes on every render, but always writes to the same key
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -200,6 +213,7 @@ export function useOfflineSong(
       toast.success("Música removida do modo offline");
     } else {
       setExcluded((current) => current.filter((other) => other !== key));
+      requestedRef.current = true;
       setSaveAttempt((attempt) => attempt + 1);
     }
   };
