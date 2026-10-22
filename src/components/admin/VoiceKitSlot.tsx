@@ -69,11 +69,12 @@ function VoiceKitSlot({
 
   useEffect(() => {
     // Stop and drop the element when the kit is replaced or removed, so a
-    // preview never keeps playing audio that is no longer on screen.
-    const audio = audioRef.current;
-
+    // preview never keeps playing audio that is no longer on screen, and the
+    // next play loads the new file rather than the one it replaced.
     return () => {
-      audio?.pause();
+      audioRef.current?.pause();
+      audioRef.current = null;
+      setPlaying(false);
     };
   }, [slot.url]);
 
@@ -91,7 +92,8 @@ function VoiceKitSlot({
       return;
     }
 
-    void audioRef.current.play();
+    // A file that fails to load rejects, and the button goes back to play
+    audioRef.current.play().catch(() => setPlaying(false));
     setPlaying(true);
   }
 
@@ -167,15 +169,19 @@ function VoiceKitSlot({
           </button>
         )}
 
+        {/* Once confirming, the kit is being saved and can no longer be
+            called back */}
         {busy ? (
-          <button
-            type="button"
-            onClick={onCancel}
-            className="flex items-center gap-1.5 rounded-lg bg-gray-700 px-3 py-2 text-xs text-gray-100 transition hover:bg-gray-600"
-          >
-            <X size={14} />
-            Cancelar
-          </button>
+          upload.phase !== "confirming" && (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="flex items-center gap-1.5 rounded-lg bg-gray-700 px-3 py-2 text-xs text-gray-100 transition hover:bg-gray-600"
+            >
+              <X size={14} />
+              Cancelar
+            </button>
+          )
         ) : (
           <button
             type="button"

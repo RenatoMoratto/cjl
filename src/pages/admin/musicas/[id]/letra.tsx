@@ -115,9 +115,9 @@ export default function EditarLetra({
     (index: number) => {
       const seconds = Math.max(0, getCurrentTime() + offsetMs / 1000);
       updateLine(index, { time: roundToCentiseconds(seconds) });
-      setSelected((current) =>
-        Math.min(current + 1, Math.max(0, lines.length - 1)),
-      );
+      // The line after the one stamped, which a row's own button may not be
+      // the selected one
+      setSelected(Math.min(index + 1, Math.max(0, lines.length - 1)));
     },
     [getCurrentTime, offsetMs, updateLine, lines.length],
   );
@@ -127,15 +127,19 @@ export default function EditarLetra({
       const target = event.target as HTMLElement | null;
 
       // Otherwise Space pauses the song and S toggles solo while someone is
-      // simply typing a lyric.
+      // simply typing a lyric, and the arrows cannot change the audio select.
       if (
         target &&
         (target.tagName === "INPUT" ||
           target.tagName === "TEXTAREA" ||
+          target.tagName === "SELECT" ||
           target.isContentEditable)
       ) {
         return;
       }
+
+      // Browser shortcuts (Cmd+[ goes back, Ctrl+T opens a tab) stay theirs
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
 
       switch (event.key) {
         case " ":
