@@ -44,6 +44,10 @@ export default function Musica() {
   const rawVoice = Array.isArray(params?.voz) ? params.voz[0] : params?.voz;
   const voice = rawVoice && isVoice(rawVoice) ? rawVoice : undefined;
   const songId = Number(params?.musica ?? "");
+  // A segment that is no id at all (a mistyped link) would otherwise fetch
+  // nothing and leave the page loading forever
+  const isValidId = Number.isInteger(songId) && songId > 0;
+  const isInvalidId = Boolean(params?.musica) && !isValidId;
 
   // The params are empty until the router is ready, so nothing is fetched yet
   const {
@@ -51,11 +55,14 @@ export default function Musica() {
     error: fetchError,
     isValidating,
     mutate,
-  } = useSWR<SongDetail, FetchError>(songId ? `/api/musicas/${songId}` : null);
-  const loading = !song && !fetchError;
+  } = useSWR<SongDetail, FetchError>(
+    isValidId ? `/api/musicas/${songId}` : null,
+  );
+  const loading = !song && !fetchError && !isInvalidId;
   // Fails without a network only when the song isn't saved offline
-  const error =
-    fetchError && !song
+  const error = isInvalidId
+    ? "Música não encontrada"
+    : fetchError && !song
       ? fetchError.offline
         ? "Música não disponível offline"
         : fetchError.status === 404 || fetchError.status === 400
@@ -63,7 +70,7 @@ export default function Musica() {
           : "Não foi possível carregar a música."
       : null;
   // A missing song stays missing; anything else may work a second time
-  const canRetry = Boolean(error) && fetchError?.status !== 404;
+  const canRetry = Boolean(error) && !isInvalidId && fetchError?.status !== 404;
   const online = useOnline();
 
   // A song may simply not have a kit for this voice — five of them have no

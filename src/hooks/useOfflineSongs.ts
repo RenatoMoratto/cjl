@@ -90,7 +90,9 @@ export function useOfflineSong(
 ) {
   const [offlineSongs, updateOfflineSongs] = useOfflineSongList();
   const [excluded, setExcluded] = useLocalStorage<string[]>(EXCLUDED_KEY, []);
-  const [isSaving, setIsSaving] = useState(false);
+  // Keyed by song and voice: the page stays mounted from one song to the
+  // next, and a download still running for the previous one is not this one's
+  const [savingKeys, setSavingKeys] = useState<string[]>([]);
   const [saveAttempt, setSaveAttempt] = useState(0);
   // Set by the switch: songs saved on their own as they are opened report
   // nothing, a save the user asked for reports how it went
@@ -103,7 +105,7 @@ export function useOfflineSong(
     (other) => songKey(other.id, other.voice) === key,
   );
   // A download turned off midway is discarded when it finishes
-  const isSavingNow = isSaving && isOfflineEnabled;
+  const isSavingNow = savingKeys.includes(key) && isOfflineEnabled;
 
   useEffect(() => {
     const requested = requestedRef.current;
@@ -113,6 +115,8 @@ export function useOfflineSong(
       return;
 
     const entry: OfflineSong = { id: song.id, voice, audioUrl: track.url };
+    const entryKey = songKey(entry.id, entry.voice);
+    let markedSaving = false;
 
     const markAsRecent = () =>
       updateOfflineSongs((current) =>
@@ -152,7 +156,8 @@ export function useOfflineSong(
         return;
       }
 
-      setIsSaving(true);
+      markedSaving = true;
+      setSavingKeys((current) => [...current, entryKey]);
       try {
         await download(cache);
       } catch (error) {
@@ -169,11 +174,7 @@ export function useOfflineSong(
       }
 
       // The user may have turned offline off while the song was downloading
-      if (
-        readStorage<string[]>(EXCLUDED_KEY, []).includes(
-          songKey(entry.id, entry.voice),
-        )
-      ) {
+      if (readStorage<string[]>(EXCLUDED_KEY, []).includes(entryKey)) {
         await removeFromCache(
           [entry],
           readStorage<OfflineSong[]>(OFFLINE_SONGS_KEY, []),
@@ -191,7 +192,14 @@ export function useOfflineSong(
         console.warn("Falha ao salvar música offline", error);
         if (requested) toast.error("Não foi possível salvar a música offline");
       })
-      .finally(() => setIsSaving(false));
+      .finally(() => {
+        if (!markedSaving) return;
+        // One entry, not every one: the same song may be saving twice over
+        setSavingKeys((current) => {
+          const index = current.indexOf(entryKey);
+          return [...current.slice(0, index), ...current.slice(index + 1)];
+        });
+      });
     // updateOfflineSongs changes on every render, but always writes to the same key
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [song, voice, isOfflineEnabled, saveAttempt]);

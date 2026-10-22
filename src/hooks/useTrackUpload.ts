@@ -90,6 +90,13 @@ function putToStorage({
     xhr.onerror = () => reject(new Error(describeUploadFailure(0)));
     xhr.onabort = () => reject(new DOMException("Aborted", "AbortError"));
 
+    // Cancelled while the URL was being signed: an abort listener added now
+    // would never fire, and the file would go up anyway.
+    if (signal.aborted) {
+      reject(new DOMException("Aborted", "AbortError"));
+      return;
+    }
+
     signal.addEventListener("abort", () => xhr.abort(), { once: true });
 
     xhr.send(file);
@@ -175,6 +182,10 @@ export function useTrackUpload(songId: number, onUploaded: () => void) {
             signal: controller.signal,
           });
         }
+
+        // The last moment a cancel can still keep the kit the song has: once
+        // confirmed, the row points at the new file.
+        controller.signal.throwIfAborted();
 
         update(voice, { phase: "confirming", percent: 100 });
 
