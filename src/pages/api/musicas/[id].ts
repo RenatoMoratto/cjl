@@ -12,6 +12,13 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SongDetail | { error: string }>,
 ) {
+  if (req.method !== "GET") {
+    res.setHeader("Allow", "GET");
+    return res
+      .status(405)
+      .json({ error: `Método ${req.method} não permitido` });
+  }
+
   const id = Number(
     Array.isArray(req.query.id) ? req.query.id[0] : req.query.id,
   );

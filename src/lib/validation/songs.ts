@@ -23,6 +23,9 @@ import { Status, VOICES } from "@/types";
 /** Mirrors next.config.ts images.remotePatterns — keep the two in sync. */
 export const ALLOWED_IMAGE_HOSTS = ["i.ytimg.com"] as const;
 
+/** Stands in for the site's own origin when resolving a root-relative path. */
+const LOCAL_ORIGIN = "https://local.invalid";
+
 const MAX_TITLE_LENGTH = 200;
 const MAX_AUTHOR_LENGTH = 200;
 const MAX_SLUG_LENGTH = 80;
@@ -82,15 +85,18 @@ export const imageUrlSchema = z
   .min(1, "A imagem é obrigatória")
   .refine(
     (value) => {
-      if (value.startsWith("/") && !value.startsWith("//")) return true;
-
+      // Resolved the way a browser resolves it, because a prefix check is not
+      // enough: "//host", "/\host" and "/<tab>/host" all start with "/" and
+      // all load from another origin.
       let url: URL;
 
       try {
-        url = new URL(value);
+        url = new URL(value, LOCAL_ORIGIN);
       } catch {
         return false;
       }
+
+      if (value.startsWith("/")) return url.origin === LOCAL_ORIGIN;
 
       return (
         url.protocol === "https:" &&

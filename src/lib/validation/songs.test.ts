@@ -97,6 +97,10 @@ describe("imageUrlSchema", () => {
     for (const value of [
       "http://i.ytimg.com/vi/abc/hq.jpg",
       "//i.ytimg.com/vi/abc/hq.jpg",
+      // Browsers read a backslash as a slash and drop tabs, so both of these
+      // resolve to evil.example although they start with a single "/".
+      "/\\evil.example/x.jpg",
+      "/\t/evil.example/x.jpg",
       "javascript:alert(1)",
       "not a url",
     ]) {
