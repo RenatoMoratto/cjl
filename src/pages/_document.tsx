@@ -6,9 +6,11 @@ const SITE_URL = "https://coraljovemlondrina.com.br";
 // A small JPEG: link previews (WhatsApp in particular) skip large or WebP images
 const SOCIAL_IMAGE_URL = `${SITE_URL}/images/og.jpg`;
 
-// iOS shows a blank screen while the installed app starts unless there is a
-// launch image of the exact screen size. Android draws its own from the
-// manifest. Portrait CSS size and pixel ratio; images in public/splash.
+// iOS shows a white screen while the installed app starts unless there is a
+// launch image of the exact screen size. Ours are plain background, so the
+// opening (SplashScreen) starts from an empty screen. Android draws its own
+// from the manifest. Portrait CSS size and pixel ratio; images in
+// public/splash.
 const SPLASH_SCREENS = [
   [375, 667, 2], // iPhone 8, SE 2/3
   [414, 736, 3], // iPhone 8 Plus
