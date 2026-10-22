@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 
 /**
- * The installed app's opening. It starts on an explosion: dots burst from the
- * middle of the screen and slow to a drifting cloud, then come back letter by
- * letter (each outline first, then its inside) to form the logo. The real
- * logo appears under them, and the dots fly off as the app appears.
+ * The installed app's opening. Dots fade in all over the screen, already
+ * drifting, then gather letter by letter (each outline first, then its
+ * inside) to form the logo. The real logo appears under them, and the dots
+ * fly off as the app appears.
  *
  * The script in _document.tsx marks a launch with data-splash on <html>
  * before the first paint, so the overlay covers the page from the first
@@ -17,18 +17,19 @@ import { useEffect, useRef, useState } from "react";
 // dropped frame never knocks the choreography out of step.
 
 // Timeline, in ms from the first frame
-const BURST_MS = 1000; // out from the middle, slowing to a float
-const GATHER_AT = 950;
-const GATHER_MS = 800;
-const LETTER_STAGGER = 160; // between C, J and L
-const TRACE_MS = 320; // dots of an outline arrive in order around it
-const FILL_MS = 260; // then the inside fills in, from the outline inwards
-const TAGLINE_STAGGER = 18; // between the letters of the tagline
-const SETTLE_MS = 250; // the formed logo, before the dots fly off
-const LEAVE_MS = 650;
-const REVEAL_DELAY = 350; // into the flight, the logo lifts away
-const LOGO_OUT_MS = 260;
-const REVEAL_MS = 450; // then the app shows
+const APPEAR_MS = 200; // the dots fade in over this, each at its own moment
+const FADE_IN_MS = 200;
+const GATHER_AT = 360;
+const GATHER_MS = 650;
+const LETTER_STAGGER = 120; // between C, J and L
+const TRACE_MS = 260; // dots of an outline arrive in order around it
+const FILL_MS = 200; // then the inside fills in, from the outline inwards
+const TAGLINE_STAGGER = 12; // between the letters of the tagline
+const SETTLE_MS = 180; // the formed logo, before the dots fly off
+const LEAVE_MS = 550;
+const REVEAL_DELAY = 250; // into the flight, the logo lifts away
+const LOGO_OUT_MS = 220;
+const REVEAL_MS = 350; // then the app shows
 const FADE_MS = 400; // reduced motion, or a tap
 
 // Same color as the launch images and the manifest's background_color
@@ -41,23 +42,18 @@ interface Particles {
   homeY: Float32Array;
   homeRadius: Float32Array;
   homeAngle: Float32Array;
-  /** Where the dot bursts from, near the middle. */
-  burstX: Float32Array;
-  burstY: Float32Array;
-  /** Where the dot flies out to, relative to the logo's center. */
+  /** Where the dot floats, relative to the logo's center. */
   outX: Float32Array;
   outY: Float32Array;
   /** Its own pace around the logo while out, in radians per ms. */
   drift: Float32Array;
-  /** How far its paths out and back bow to one side, and which side. */
-  bendOut: Float32Array;
+  /** How far its path home bows to one side, and which side. */
   bendBack: Float32Array;
-  /** Its wobble in flight: size, speeds and phases. */
+  /** Its wobble while it floats: size, speeds and phases. */
   wobble: Float32Array;
   wobbleSpeed: Float32Array;
   phase: Float32Array;
-  scatterStart: Float32Array;
-  scatterEnd: Float32Array;
+  appearAt: Float32Array;
   gatherStart: Float32Array;
   gatherEnd: Float32Array;
   leaveDelay: Float32Array;
@@ -74,7 +70,7 @@ const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 const easeInOutCubic = (t: number) =>
   t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
 const easeInCubic = (t: number) => t * t * t;
-const easeOutQuart = (t: number) => 1 - (1 - t) ** 4;
+const easeOutCubic = (t: number) => 1 - (1 - t) ** 3;
 
 /** Runs of [start, end) where `filled` holds, between `from` and `to`. */
 function runs(from: number, to: number, filled: (i: number) => boolean) {
@@ -241,18 +237,14 @@ function sampleLogo(
     homeY: new Float32Array(count),
     homeRadius: new Float32Array(count),
     homeAngle: new Float32Array(count),
-    burstX: new Float32Array(count),
-    burstY: new Float32Array(count),
     outX: new Float32Array(count),
     outY: new Float32Array(count),
     drift: new Float32Array(count),
-    bendOut: new Float32Array(count),
     bendBack: new Float32Array(count),
     wobble: new Float32Array(count),
     wobbleSpeed: new Float32Array(count),
     phase: new Float32Array(count),
-    scatterStart: new Float32Array(count),
-    scatterEnd: new Float32Array(count),
+    appearAt: new Float32Array(count),
     gatherStart: new Float32Array(count),
     gatherEnd: new Float32Array(count),
     leaveDelay: new Float32Array(count),
@@ -276,31 +268,24 @@ function sampleLogo(
     particles.homeRadius[i] = radius;
     particles.homeAngle[i] = angle;
 
-    // From a small core in the middle out into a loose cloud the shape of
-    // the screen, roughly away from where the dot sits in the logo
-    const core = viewportRadius * 0.05 * Math.sqrt(Math.random());
-    const coreAngle = random(0, 2 * Math.PI);
-    particles.burstX[i] = Math.cos(coreAngle) * core;
-    particles.burstY[i] = Math.sin(coreAngle) * core;
-    const outAngle = angle + random(-0.9, 0.9);
-    const reach = 0.2 + 0.6 * Math.random() ** 0.8;
+    // Anywhere on the screen, evenly spread, loosely on the side of the logo
+    // the dot belongs to
+    const outAngle = angle + random(-1.5, 1.5);
+    const reach = 0.1 + 0.85 * Math.sqrt(Math.random());
     particles.outX[i] = (Math.cos(outAngle) * reach * viewport.width) / 2;
     particles.outY[i] = (Math.sin(outAngle) * reach * viewport.height) / 2;
     // Most drift with the flow, at their own pace; a few against it
     particles.drift[i] =
       random(0.00025, 0.0009) * (Math.random() < 0.85 ? 1 : -1);
-    particles.bendOut[i] = random(-0.55, 0.55);
     particles.bendBack[i] = random(0.1, 0.5) * (Math.random() < 0.8 ? 1 : -1);
     particles.wobble[i] = viewportRadius * random(0.01, 0.045);
     particles.wobbleSpeed[i] = random(0.003, 0.008);
     particles.phase[i] = random(0, 2 * Math.PI);
 
-    // All at once, but each dot at its own speed so none move in step
-    const scatterStart = random(0, 90);
-    const scatterEnd = scatterStart + BURST_MS * random(0.7, 1.3);
-    const gatherStart = Math.max(GATHER_AT + p.delay, scatterEnd);
-    particles.scatterStart[i] = scatterStart;
-    particles.scatterEnd[i] = scatterEnd;
+    // Each at its own moment, and home only once fully in view
+    const appearAt = random(0, APPEAR_MS);
+    const gatherStart = Math.max(GATHER_AT + p.delay, appearAt + FADE_IN_MS);
+    particles.appearAt[i] = appearAt;
     particles.gatherStart[i] = gatherStart;
     particles.gatherEnd[i] = gatherStart + GATHER_MS * random(0.85, 1.15);
     particles.formedAt = Math.max(particles.formedAt, particles.gatherEnd[i]);
@@ -362,7 +347,7 @@ function play(
       duration: FADE_MS,
       fill: "forwards",
     });
-    const timer = setTimeout(fadeOut, 1100);
+    const timer = setTimeout(fadeOut, 800);
     cleanups.push(() => clearTimeout(timer));
     return () => {
       stopped = true;
@@ -420,7 +405,7 @@ function play(
     const { count, formedAt } = particles;
     const leaveAt = formedAt + SETTLE_MS;
     const revealAt = leaveAt + REVEAL_DELAY;
-    const end = Math.max(revealAt + 150 + REVEAL_MS, leaveAt + LEAVE_MS + 160);
+    const end = Math.max(revealAt + 120 + REVEAL_MS, leaveAt + LEAVE_MS + 160);
     const x = new Float32Array(count);
     const y = new Float32Array(count);
     const size = new Float32Array(count);
@@ -441,7 +426,7 @@ function play(
       logo.style.opacity = String(clamp01((t - formedAt - 40) / 320) - lift);
       logo.style.transform = `translate(-50%, -50%) scale(${1 + 0.08 * easeInCubic(lift)})`;
       overlay.style.opacity = String(
-        1 - clamp01((t - revealAt - 150) / REVEAL_MS),
+        1 - clamp01((t - revealAt - 120) / REVEAL_MS),
       );
 
       // A light passes over the formed logo
@@ -455,7 +440,7 @@ function play(
         const a0 = particles.homeAngle[i];
         const hx = particles.homeX[i];
         const hy = particles.homeY[i];
-        const scatterStart = particles.scatterStart[i];
+        const appearAt = particles.appearAt[i];
         const gatherStart = particles.gatherStart[i];
         const gatherEnd = particles.gatherEnd[i];
         const leaveStart = leaveAt + particles.leaveDelay[i];
@@ -471,57 +456,46 @@ function play(
           px = Math.cos(angle) * radius;
           py = Math.sin(angle) * radius;
           s *= 1 - p;
-        } else if (t <= scatterStart) {
-          // Not out yet
+        } else if (t <= appearAt) {
+          // Not in view yet
           s = 0;
         } else if (t < gatherEnd) {
           // Where the dot is in the cloud: its spot, carried around the logo
           const outAt = (time: number) => {
-            const turn = particles.drift[i] * (time - scatterStart);
+            const turn = particles.drift[i] * (time - appearAt);
             const cos = Math.cos(turn);
             const sin = Math.sin(turn);
             const ox = particles.outX[i];
             const oy = particles.outY[i];
             return [ox * cos - oy * sin, ox * sin + oy * cos];
           };
-          let from: number[];
-          let to: number[];
-          let bend: number;
-          let p: number;
+          // How free the dot still is: fully while it floats, none once home
+          let free = 1;
           if (t < gatherStart) {
-            // Bursts out on a curve, slowing to a float, and grows in fast
-            const scatterEnd = particles.scatterEnd[i];
-            const q = clamp01((t - scatterStart) / (scatterEnd - scatterStart));
-            p = easeOutQuart(q);
-            from = [particles.burstX[i], particles.burstY[i]];
-            to = outAt(t);
-            bend = particles.bendOut[i];
-            s *= 0.85 * (0.2 + 0.8 * easeOutQuart(clamp01(q * 5)));
+            // Floats, fading in
+            [px, py] = outAt(t);
+            s *= 0.85 * easeOutCubic(clamp01((t - appearAt) / FADE_IN_MS));
           } else {
-            // Drawn back home on a curve of its own
+            // Drawn home on a curve: its middle pushed off the straight line
             const q = (t - gatherStart) / (gatherEnd - gatherStart);
-            p = easeInOutCubic(q);
-            from = outAt(gatherStart);
-            to = [hx, hy];
-            bend = particles.bendBack[i];
+            const p = easeInOutCubic(q);
+            free = 1 - p;
+            const [fx, fy] = outAt(gatherStart);
+            const bend = particles.bendBack[i];
+            const cx = (fx + hx) / 2 - (hy - fy) * bend;
+            const cy = (fy + hy) / 2 + (hx - fx) * bend;
+            const u = 1 - p;
+            px = u * u * fx + 2 * u * p * cx + p * p * hx;
+            py = u * u * fy + 2 * u * p * cy + p * p * hy;
             // Grows back, swelling a little as it lands
             s *=
               (0.85 + 0.15 * q) *
               (1 + 0.7 * Math.exp(-(((q - 0.9) / 0.09) ** 2)));
           }
-          // A quadratic curve whose middle is pushed off the straight line
-          const dx = to[0] - from[0];
-          const dy = to[1] - from[1];
-          const cx = from[0] + dx / 2 - dy * bend;
-          const cy = from[1] + dy / 2 + dx * bend;
-          const u = 1 - p;
-          px = u * u * from[0] + 2 * u * p * cx + p * p * to[0];
-          py = u * u * from[1] + 2 * u * p * cy + p * p * to[1];
 
-          // Turbulence, strongest mid-flight and none at either end, so the
+          // Turbulence while it floats, gone by the time it is home, so the
           // letters still form exactly
-          const flight = (t - scatterStart) / (gatherEnd - scatterStart);
-          const sway = Math.sin(Math.PI * flight) * particles.wobble[i];
+          const sway = free * particles.wobble[i];
           const speed = particles.wobbleSpeed[i];
           const phase = particles.phase[i];
           px +=
@@ -533,11 +507,7 @@ function play(
             (Math.cos(t * speed * 0.8 + phase * 1.3) +
               0.5 * Math.sin(t * speed * 1.9 + phase));
           // and a twinkle
-          s *=
-            1 -
-            0.2 *
-              Math.sin(Math.PI * flight) *
-              (0.5 + 0.5 * Math.sin(t * 0.013 + phase * 3));
+          s *= 1 - 0.2 * free * (0.5 + 0.5 * Math.sin(t * 0.013 + phase * 3));
         }
 
         if (shine !== null) {
