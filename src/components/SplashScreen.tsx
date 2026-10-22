@@ -1,16 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 
 /**
- * The installed app's opening. The logo left by the iOS launch image breaks
- * into dots, which swirl out across the screen and come back letter by letter
- * (each outline first, then its inside) to form it again. The real logo
- * returns under them, and the dots fly off as the app appears.
+ * The installed app's opening. It starts on an explosion: dots burst from the
+ * middle of the screen and slow to a drifting cloud, then come back letter by
+ * letter (each outline first, then its inside) to form the logo. The real
+ * logo appears under them, and the dots fly off as the app appears.
  *
  * The script in _document.tsx marks a launch with data-splash on <html>
  * before the first paint, so the overlay covers the page from the first
- * frame, with the logo exactly where the launch image had it (globals.css).
- * Anywhere else the overlay stays hidden, and goes once mounted. A tap skips
- * it; with reduced motion the logo just fades out.
+ * frame (globals.css). Anywhere else the overlay stays hidden, and goes once
+ * mounted. A tap skips it; with reduced motion the logo just fades in and out.
  */
 
 // The dots are drawn on one canvas, from typed arrays: no element or React
@@ -18,10 +17,8 @@ import { useEffect, useRef, useState } from "react";
 // dropped frame never knocks the choreography out of step.
 
 // Timeline, in ms from the first frame
-const DISSOLVE_MS = 260; // the launch image's logo gives way to its dots
-const SCATTER_AT = 120;
-const SCATTER_MS = 600;
-const GATHER_AT = 750;
+const BURST_MS = 1000; // out from the middle, slowing to a float
+const GATHER_AT = 950;
 const GATHER_MS = 800;
 const LETTER_STAGGER = 160; // between C, J and L
 const TRACE_MS = 320; // dots of an outline arrive in order around it
@@ -44,6 +41,9 @@ interface Particles {
   homeY: Float32Array;
   homeRadius: Float32Array;
   homeAngle: Float32Array;
+  /** Where the dot bursts from, near the middle. */
+  burstX: Float32Array;
+  burstY: Float32Array;
   /** Where the dot flies out to, relative to the logo's center. */
   outX: Float32Array;
   outY: Float32Array;
@@ -74,7 +74,7 @@ const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 const easeInOutCubic = (t: number) =>
   t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
 const easeInCubic = (t: number) => t * t * t;
-const easeOutCubic = (t: number) => 1 - (1 - t) ** 3;
+const easeOutQuart = (t: number) => 1 - (1 - t) ** 4;
 
 /** Runs of [start, end) where `filled` holds, between `from` and `to`. */
 function runs(from: number, to: number, filled: (i: number) => boolean) {
@@ -241,6 +241,8 @@ function sampleLogo(
     homeY: new Float32Array(count),
     homeRadius: new Float32Array(count),
     homeAngle: new Float32Array(count),
+    burstX: new Float32Array(count),
+    burstY: new Float32Array(count),
     outX: new Float32Array(count),
     outY: new Float32Array(count),
     drift: new Float32Array(count),
@@ -274,8 +276,12 @@ function sampleLogo(
     particles.homeRadius[i] = radius;
     particles.homeAngle[i] = angle;
 
-    // Out into a loose cloud the shape of the screen, roughly away from
-    // where the dot sits in the logo
+    // From a small core in the middle out into a loose cloud the shape of
+    // the screen, roughly away from where the dot sits in the logo
+    const core = viewportRadius * 0.05 * Math.sqrt(Math.random());
+    const coreAngle = random(0, 2 * Math.PI);
+    particles.burstX[i] = Math.cos(coreAngle) * core;
+    particles.burstY[i] = Math.sin(coreAngle) * core;
     const outAngle = angle + random(-0.9, 0.9);
     const reach = 0.2 + 0.6 * Math.random() ** 0.8;
     particles.outX[i] = (Math.cos(outAngle) * reach * viewport.width) / 2;
@@ -289,13 +295,9 @@ function sampleLogo(
     particles.wobbleSpeed[i] = random(0.003, 0.008);
     particles.phase[i] = random(0, 2 * Math.PI);
 
-    // The letters leave in the order they come back, each dot at its own
-    // speed so none move in step
-    const scatterStart =
-      SCATTER_AT +
-      (p.delay / (3 * LETTER_STAGGER + 30 * TAGLINE_STAGGER)) * 120 +
-      Math.random() * 110;
-    const scatterEnd = scatterStart + SCATTER_MS * random(0.75, 1.25);
+    // All at once, but each dot at its own speed so none move in step
+    const scatterStart = random(0, 90);
+    const scatterEnd = scatterStart + BURST_MS * random(0.7, 1.3);
     const gatherStart = Math.max(GATHER_AT + p.delay, scatterEnd);
     particles.scatterStart[i] = scatterStart;
     particles.scatterEnd[i] = scatterEnd;
@@ -356,7 +358,11 @@ function play(
   cleanups.push(() => overlay.removeEventListener("pointerdown", fadeOut));
 
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    const timer = setTimeout(fadeOut, 500);
+    logo.animate([{ opacity: 0 }, { opacity: 1 }], {
+      duration: FADE_MS,
+      fill: "forwards",
+    });
+    const timer = setTimeout(fadeOut, 1100);
     cleanups.push(() => clearTimeout(timer));
     return () => {
       stopped = true;
@@ -429,14 +435,10 @@ function play(
       last = now;
       const t = elapsed;
 
-      // The logo: gives way to its dots, returns once they have formed it and
-      // lifts away before the app shows, rather than fading over it
+      // The logo: appears once the dots have formed it, and lifts away before
+      // the app shows, rather than fading over it
       const lift = clamp01((t - revealAt) / LOGO_OUT_MS);
-      logo.style.opacity = String(
-        t < DISSOLVE_MS
-          ? 1 - t / DISSOLVE_MS
-          : clamp01((t - formedAt - 40) / 320) - lift,
-      );
+      logo.style.opacity = String(clamp01((t - formedAt - 40) / 320) - lift);
       logo.style.transform = `translate(-50%, -50%) scale(${1 + 0.08 * easeInCubic(lift)})`;
       overlay.style.opacity = String(
         1 - clamp01((t - revealAt - 150) / REVEAL_MS),
@@ -469,7 +471,10 @@ function play(
           px = Math.cos(angle) * radius;
           py = Math.sin(angle) * radius;
           s *= 1 - p;
-        } else if (t > scatterStart && t < gatherEnd) {
+        } else if (t <= scatterStart) {
+          // Not out yet
+          s = 0;
+        } else if (t < gatherEnd) {
           // Where the dot is in the cloud: its spot, carried around the logo
           const outAt = (time: number) => {
             const turn = particles.drift[i] * (time - scatterStart);
@@ -484,15 +489,14 @@ function play(
           let bend: number;
           let p: number;
           if (t < gatherStart) {
-            // Bursts out on a curve, slowing as it goes
+            // Bursts out on a curve, slowing to a float, and grows in fast
             const scatterEnd = particles.scatterEnd[i];
-            p = easeOutCubic(
-              clamp01((t - scatterStart) / (scatterEnd - scatterStart)),
-            );
-            from = [hx, hy];
+            const q = clamp01((t - scatterStart) / (scatterEnd - scatterStart));
+            p = easeOutQuart(q);
+            from = [particles.burstX[i], particles.burstY[i]];
             to = outAt(t);
             bend = particles.bendOut[i];
-            s *= 1 - 0.15 * p;
+            s *= 0.85 * (0.2 + 0.8 * easeOutQuart(clamp01(q * 5)));
           } else {
             // Drawn back home on a curve of its own
             const q = (t - gatherStart) / (gatherEnd - gatherStart);
@@ -548,8 +552,8 @@ function play(
 
       context.setTransform(ratio, 0, 0, ratio, 0, 0);
       // Trails while the dots fly: each frame only dims the last one. Not
-      // over the logo, which must show through.
-      if (t > DISSOLVE_MS && t < formedAt) {
+      // once the logo is back, which must show through.
+      if (t < formedAt) {
         context.globalAlpha = 0.32;
         context.fillStyle = BACKGROUND;
         context.fillRect(0, 0, width, height);

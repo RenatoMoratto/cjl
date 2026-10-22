@@ -37,8 +37,8 @@ body {
 
 /* The installed app's opening (SplashScreen). Shown only once the script in
    _document.tsx marks a launch, so other visits never download its logo. The
-   logo sits where the iOS launch images draw it: centered, at half the
-   screen's short side, and at most its file's 583 device pixels. */
+   logo, hidden until the dots form it, is centered, at half the screen's
+   short side and at most its file's 583 device pixels. */
 .splash {
   display: none;
 }
@@ -60,6 +60,7 @@ html[data-splash] .splash {
   aspect-ratio: 583 / 239;
   transform: translate(-50%, -50%);
   background: center / contain no-repeat;
+  opacity: 0;
 }
 
 html[data-splash] .splash-logo {
