@@ -44,6 +44,17 @@ const SPLASH_SCREENS = [
   }),
 );
 
+// Marks a launch of the installed app before the first paint, so its opening
+// (SplashScreen) covers the page from the first frame. Once per launch: the
+// session lasts while the app stays open. ?splash plays it in a browser too.
+const SPLASH_SCRIPT = `try {
+  var app = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  if ((app && !sessionStorage.getItem("splash-shown")) || /[?&]splash\\b/.test(location.search)) {
+    sessionStorage.setItem("splash-shown", "1");
+    document.documentElement.setAttribute("data-splash", "");
+  }
+} catch (error) {}`;
+
 export default function Document() {
   return (
     <Html lang="pt-BR">
@@ -95,6 +106,7 @@ export default function Document() {
         <meta name="apple-mobile-web-app-title" content="CJL" />
         {/* iOS has tied launch images to this tag; the manifest may not do */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
+        <script dangerouslySetInnerHTML={{ __html: SPLASH_SCRIPT }} />
         {SPLASH_SCREENS.map(({ href, media }) => (
           <link
             key={href}

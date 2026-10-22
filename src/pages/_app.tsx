@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { SWRConfig } from "swr";
 import { fetchJson } from "@/lib/fetcher";
 import { listenForInstallPrompt } from "@/hooks/useInstallApp";
+import SplashScreen from "@/components/SplashScreen";
 
 export default function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
@@ -33,6 +34,7 @@ export default function App({ Component, pageProps }: AppProps) {
       }}
     >
       <Component {...pageProps} />
+      <SplashScreen />
       <Analytics />
     </SWRConfig>
   );
