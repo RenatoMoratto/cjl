@@ -34,3 +34,46 @@ body {
     line-height: 1.5;
   }
 }
+
+/* The installed app's opening (SplashScreen). Shown only once the script in
+   _document.tsx marks a launch, so other visits never download its logo. The
+   logo sits where the iOS launch images draw it: centered, at half the
+   screen's short side, and at most its file's 583 device pixels. */
+.splash {
+  display: none;
+}
+
+html[data-splash] .splash {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #111827;
+  touch-action: none;
+}
+
+.splash-logo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(50vmin, 583px);
+  aspect-ratio: 583 / 239;
+  transform: translate(-50%, -50%);
+  background: center / contain no-repeat;
+}
+
+html[data-splash] .splash-logo {
+  background-image: url("../../public/images/logo.webp");
+}
+
+@media (min-resolution: 2dppx) {
+  .splash-logo {
+    width: min(50vmin, 291.5px);
+  }
+}
+
+@media (min-resolution: 3dppx) {
+  .splash-logo {
+    width: min(50vmin, 194.33px);
+  }
+}
