@@ -107,11 +107,16 @@ async function networkFirst(request, cacheName, cacheKey, timeout) {
   network.catch(() => {});
 
   try {
-    if (!timeout) return await network;
-    return await Promise.race([
-      network,
-      new Promise((_, reject) => setTimeout(reject, timeout)),
-    ]);
+    const response = await (timeout
+      ? Promise.race([
+          network,
+          new Promise((_, reject) => setTimeout(reject, timeout)),
+        ])
+      : network);
+    // A server that fails is no more use than no network: keep the copy
+    if (response.status >= 500)
+      return (await caches.match(cacheKey)) ?? response;
+    return response;
   } catch {
     // Offline or slow network: use the cache, otherwise keep waiting.
     return (await caches.match(cacheKey)) ?? network;
