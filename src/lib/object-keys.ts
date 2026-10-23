@@ -19,7 +19,7 @@ const VERSION_HEX_LENGTH = 16;
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 /**
- * Keys written by scripts/upload-songs-r2.ts during the JSON-to-Neon
+ * Keys written by the bulk upload script during the JSON-to-Neon
  * migration: "songs/<slug>/<voice>.mp3", with no version segment. They are
  * still valid keys to read and to delete, they are just never minted again.
  */

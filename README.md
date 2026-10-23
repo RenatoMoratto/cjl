@@ -1,255 +1,245 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# Coral Jovem de Londrina
 
-## Getting Started
+The website of the Coral Jovem de Londrina (CJL), live at
+[coraljovemlondrina.com.br](https://coraljovemlondrina.com.br).
 
-First, run the development server:
+Choristers use it to rehearse with the **voice kits**: each song is recorded
+once per voice, and the player shows its lyrics in sync. They also use it to
+check the rehearsal agenda. The site can be installed as an app, and it keeps
+working offline.
+
+An admin panel at `/admin` is where songs, voice kits, lyrics and the agenda
+are managed. It has its own guide: [docs/admin.md](docs/admin.md).
+
+- [Stack](#stack)
+- [Getting started](#getting-started)
+- [Scripts](#scripts)
+- [Project layout](#project-layout)
+- [How it works](#how-it-works)
+- [Deploying](#deploying)
+- [Maintenance](#maintenance)
+
+## Stack
+
+- [Next.js 15](https://nextjs.org) (Pages Router), React 19, Tailwind CSS 3, SWR
+- [Neon](https://neon.tech) Postgres through [Drizzle ORM](https://orm.drizzle.team)
+  for songs, voice kits and the agenda
+- [Cloudflare R2](https://developers.cloudflare.com/r2/) for the MP3s
+- [NextAuth](https://next-auth.js.org) with Google, used only for the admin sign-in
+- Hosted on [Vercel](https://vercel.com), with Vercel Analytics
+
+## Getting started
+
+You need Node 22, which `.nvmrc` pins as `lts/jod`.
 
 ```bash
+nvm use
+npm install
+cp .env.example .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open <http://localhost:3000>.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+What you put in `.env.local` depends on what you are working on.
+[.env.example](.env.example) explains every variable.
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+| To work on                 | Set in `.env.local`                                                                                                 |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Home page, splash, styling | nothing                                                                                                             |
+| Song lists, player, agenda | `DATABASE_URL`, `R2_PUBLIC_URL`                                                                                     |
+| The admin panel            | all of the above, plus the other `R2_*`, `GOOGLE_*`, `NEXTAUTH_SECRET`, `ADMIN_EMAILS` and `ADMIN_API_ENABLED=true` |
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+These variables point at real services. If `DATABASE_URL` and the R2
+credentials are the production values, then saving in your local admin panel
+changes the live site.
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Things to know when working locally:
 
-## Song management API
+- **Use port 3000.** The R2 CORS policy and the Google OAuth client both allow
+  `http://localhost:3000` and no other local origin. On any other port, saving
+  songs offline, downloading MP3s and uploading kits all fail, and Google
+  refuses the sign-in.
+- **The service worker only runs in production builds.** To test offline
+  support, run `npm run build && npm start`. Stop `npm run dev` first: both
+  commands write to `.next`, and a build under a running dev server leaves it
+  stuck in a reload loop. If that happens, stop the server, delete `.next` and
+  start it again.
+- **The opening animation** only plays when the app is launched from the home
+  screen. To see it in a browser, add `?splash` to any URL.
 
-Server-side CRUD for songs and voice kits, plus the admin UI at `/admin` that
-drives it. Both are **switched off by default** and require a signed-in,
-allowlisted Google account — see "Security" below.
+## Scripts
 
-Songs live in Neon; the MP3s live in Cloudflare R2 and the database stores only
-object keys, never URLs.
+| Command                                   | What it does                                                                          |
+| ----------------------------------------- | ------------------------------------------------------------------------------------- |
+| `npm run dev`                             | Starts the dev server on port 3000                                                    |
+| `npm run build` / `npm start`             | Builds the site for production / serves that build                                    |
+| `npm test`                                | Runs the unit tests (`src/**/*.test.ts`) with Node's test runner. Needs no env        |
+| `npm run typecheck`                       | Type-checks with `tsc --noEmit`                                                       |
+| `npm run lint`                            | Runs ESLint                                                                           |
+| `npm run lint:check` / `npm run lint:fix` | Checks / fixes formatting with Prettier                                               |
+| `npm run db:generate`                     | Writes a migration to `drizzle/` from changes in `src/lib/db/schema.ts`               |
+| `npm run db:migrate`                      | Applies pending migrations to `DATABASE_URL`                                          |
+| `npm run db:studio`                       | Opens Drizzle Studio on `DATABASE_URL`                                                |
+| `npm run r2:cors`                         | Applies the bucket's CORS policy (see [Maintenance](#maintenance))                    |
+| `npm run r2:purge`                        | Deletes R2 objects that nothing references any more                                   |
+| `npm run optimize:audio`                  | Re-encodes the MP3s in `audio-staging/` at 128 kbps (see [Maintenance](#maintenance)) |
 
-### Layout
+The scripts in `scripts/` read `.env.local`, so they act on whatever database
+and bucket it points at.
 
-| Path                              | Role                                                        |
-| --------------------------------- | ----------------------------------------------------------- |
-| `src/lib/validation/songs.ts`     | Zod schemas — the only place external input is trusted from |
-| `src/lib/object-keys.ts`          | Builds and validates R2 keys                                |
-| `src/lib/r2.ts`                   | Presign, HEAD, delete. Never streams audio                  |
-| `src/lib/cache.ts`                | Public CDN cache tags and their invalidation                |
-| `src/lib/api/admin.ts`            | The guard every admin route goes through                    |
-| `src/lib/auth/admins.ts`          | The allowlist and the 404/401/403 policy                    |
-| `src/lib/auth/options.ts`         | NextAuth configuration (Google, JWT session)                |
-| `src/lib/auth/page.ts`            | `withAdminPage`, the guard for `/admin/*` pages             |
-| `src/lib/api/client.ts`           | The browser's typed client for `/api/admin`                 |
-| `src/lib/lyrics.ts`               | Timecode parsing and line helpers for the lyrics editor     |
-| `src/services/songs.ts`           | Song create/update/delete/reorder                           |
-| `src/services/tracks.ts`          | Kit upload/replace/delete                                   |
-| `src/services/storage-cleanup.ts` | Deferred deletion of orphaned R2 objects                    |
-
-### Endpoints
+## Project layout
 
 ```text
-GET    /api/admin/songs             every song, inactive included
-POST   /api/admin/songs             create a song (metadata only)
-GET    /api/admin/songs/:id         one song
-PATCH  /api/admin/songs/:id         update metadata
-DELETE /api/admin/songs/:id         delete song, kits and (later) objects
-POST   /api/admin/songs/reorder     rewrite the public list order
-POST   /api/admin/tracks/upload-url step 1 — presign an upload
-POST   /api/admin/tracks            step 3 — persist the uploaded kit
-DELETE /api/admin/tracks/:id        remove one voice kit
-GET    /api/admin/agenda            every event, past ones included
-POST   /api/admin/agenda            create an event
-PATCH  /api/admin/agenda/:id        update an event
-DELETE /api/admin/agenda/:id        delete an event
+src/
+  pages/              routes; pages/api/ is the HTTP API
+    kits/             voice → song list → player
+    admin/            the admin panel (docs/admin.md)
+    api/admin/        admin API, every route behind withAdminRoute
+  components/         UI; admin/ and splash/ hold their own components
+  hooks/              audio player, offline songs, install prompt, uploads
+  lib/                database, R2, auth, CDN cache, validation, helpers
+  services/           what the API routes call to read and change songs and the agenda
+  types.tsx           types shared by the API and the pages
+public/
+  sw.js               the service worker (offline support)
+  manifest.webmanifest, icons/, splash/   the installable app
+drizzle/              SQL migrations, generated from src/lib/db/schema.ts
+scripts/              maintenance scripts, run with tsx
 ```
 
-### Admin UI
+## How it works
 
-| Route                      | What it does                                    |
-| -------------------------- | ----------------------------------------------- |
-| `/admin/entrar`            | Google sign-in. The only unguarded admin page   |
-| `/admin`                   | Song list: status, order, delete                |
-| `/admin/musicas/nova`      | Create a song                                   |
-| `/admin/musicas/:id`       | Metadata and the five voice-kit slots           |
-| `/admin/musicas/:id/letra` | Time the lyric against the song's own recording |
-| `/admin/agenda`            | Agenda: create, edit and delete events          |
+### Pages
 
-**Ordering** is edited with the arrow buttons (or `Alt+↑`/`Alt+↓`) and saved
-explicitly. The request always carries _every_ song id in its new order, never
-a filtered view: the server rejects a list that has drifted from the database,
-which is what stops a stale tab from dropping a song it never saw to the end.
-If that happens the UI says so and offers a reload.
+| Route                  | What it shows                                                                        |
+| ---------------------- | ------------------------------------------------------------------------------------ |
+| `/`                    | Home page: a link to the kits, social media and an install button                    |
+| `/kits`                | Choose a voice                                                                       |
+| `/kits/[voz]`          | The songs that have a kit for that voice. "Tocar todas" plays them one after another |
+| `/kits/[voz]/[musica]` | The player and the lyrics for one song                                               |
+| `/agenda`              | Upcoming rehearsals and presentations                                                |
 
-**Changing a slug does not rewrite existing object keys.** Kits already uploaded
-keep the old slug in their path and keep working; only later uploads pick up the
-new one. The form says so when it matters.
+`voz` is one of `soprano`, `contralto`, `tenor`, `baixo` or `todos` (all
+voices mixed). `musica` is the song id. Choristers share these links, so a song
+id must never change. The order of the song list is stored separately, in
+`songs.position`.
 
-**The lyrics editor** plays the song's own kit and stamps the audio element's
-clock — not React state, which only moves about four times a second — onto the
-selected line:
+On the song page, the ⋯ menu holds the reading settings (synced lyrics, text
+size, alignment), the playback speed, the "Ouvir sem internet" switch, "Baixar
+MP3" and copy lyrics.
 
-| Key            | Action                            |
-| -------------- | --------------------------------- |
-| `Space`        | play / pause                      |
-| `Enter` or `T` | stamp this line, move to the next |
-| `↑` / `↓`      | change the selected line          |
-| `[` / `]`      | nudge the stamp by ∓0.1 s         |
-| `Backspace`    | clear the stamp                   |
-| `S`            | mark the line as a solo           |
+### Data
 
-Every shortcut also has a button, and none of them fire while an input is
-focused. Paste the whole lyric first, then play and tap down the lines.
+Neon stores the songs, their lyrics (as `jsonb`), the voice kits and the
+agenda. The schema is in `src/lib/db/schema.ts`.
 
-The preview beside the editor is the chorister's own `TextReader`, unmodified.
-It decides which line is active by looking at the _next_ line's stamp, so a line
-timed earlier than the one above it highlights out of order — the editor flags
-those and offers "Ordenar por tempo".
+The MP3s are stored in a public R2 bucket. The database stores only the
+**object key** of each kit, such as `songs/<slug>/<voice>-<hex>.mp3`, never a
+full URL. The API builds the URL from the key and `R2_PUBLIC_URL`, so the audio
+host can change with an env var and no code change. Audio is cached for a year
+as `immutable`, which is why replacing a kit always writes a new key.
 
-### Uploading audio
+The pages are static, and they load their data from three public endpoints:
 
-The MP3 never passes through Vercel. Uploads are three steps:
+| Endpoint                | Returns                               |
+| ----------------------- | ------------------------------------- |
+| `GET /api/musicas`      | The active songs, in list order       |
+| `GET /api/musicas/[id]` | One song with its lyrics and kit URLs |
+| `GET /api/agenda`       | `{ events }` from today onwards       |
 
-1. `POST /api/admin/tracks/upload-url` with the song, voice, filename, content
-   type and size. The server validates the request, mints a fresh object key
-   and returns `{ uploadUrl, objectKey, requiredHeaders, expiresAt }`.
-2. The browser `PUT`s the file to `uploadUrl` with **exactly** the headers in
-   `requiredHeaders` — they are covered by the signature, so anything else is
-   rejected by R2.
-3. `POST /api/admin/tracks` with `{ songId, voice, objectKey }`. The server
-   confirms the object is really in the bucket and within limits, and only then
-   writes the row.
+Vercel's CDN caches these endpoints
+(`s-maxage=300, stale-while-revalidate=86400`), which also hides Neon's cold
+start. Each response is tagged, and every admin change invalidates the tags it
+touched, so edits show up without waiting for the cache to expire (see
+`src/lib/cache.ts`). There is no edge cache outside Vercel.
 
-Nothing is written to the database before step 3, so an abandoned upload leaves
-an unreferenced object rather than a song pointing at missing audio.
+The service worker serves cached copies of these responses offline, and it
+keeps them across deploys. So you can **add** fields to a response, but never
+rename or remove one.
 
-Direct browser uploads need the bucket to accept `PUT`; run `npm run r2:cors`
-after deploying this for the first time.
+Agenda dates and times are Londrina wall-clock values with no time zone.
+`/api/agenda` lists events from today in `America/Sao_Paulo`, so an evening
+rehearsal stays listed until midnight local time, not until 21:00 UTC.
 
-### Replacing and deleting
+### Offline and the installed app
 
-Replacing a kit always writes a **new** object key. Audio is served with
-`max-age=31536000, immutable`, so overwriting a cached key would strand
-listeners on the old file with no way to refresh it.
+`public/sw.js` is registered from `_app.tsx`, in production only, as
+`/sw.js?build=<buildId>`. Because of the build id, each deploy installs a fresh
+worker. The worker keeps three caches:
 
-Deletes never touch R2 inline. The reference is dropped in Postgres and the
-orphaned key is queued in `pending_object_deletions` in the same transaction;
-`npm run r2:purge` deletes objects whose grace period (7 days) has elapsed,
-after re-checking that nothing references them again.
+| Cache             | Holds                                                         |
+| ----------------- | ------------------------------------------------------------- |
+| `cjl-app-<build>` | The public pages and their JS, CSS and images, for this build |
+| `cjl-data`        | The song list and the agenda, kept across deploys             |
+| `cjl-songs`       | The songs saved for offline listening                         |
 
-The ordering is deliberate: an orphaned object costs a little storage and is
-invisible, whereas a row pointing at a deleted object is a player that silently
-fails. Run `npm run r2:purge -- --dry-run` to see what is due.
+The five songs a chorister opened most recently are saved for offline
+listening automatically (`src/hooks/useOfflineSongs.ts`). The "Ouvir sem
+internet" switch removes a song from that set or adds it back.
 
-### Google OAuth setup
+All the public pages are prerendered, so every URL of a dynamic route gets the
+same HTML. The worker caches each route once (see `ROUTES` in `sw.js`). **If
+you add a public page, add it to `ROUTES` too**, or it will not open offline.
 
-Google Cloud Console → **APIs & Services → Credentials → Create credentials →
-OAuth client ID → Web application**.
+The manifest and icons make the site installable. On iOS, the installed app
+also needs a launch image for each exact screen size. Those images are in
+`public/splash/`, and `_document.tsx` lists them. The opening animation in
+`src/components/splash/` plays once each time the installed app is launched.
 
-- Authorized JavaScript origins: `https://coraljovemlondrina.com.br`,
-  `http://localhost:3000`
-- Authorized redirect URIs: `https://coraljovemlondrina.com.br/api/auth/callback/google`,
-  `http://localhost:3000/api/auth/callback/google`
+## Deploying
 
-The consent screen needs only the default `email` and `profile` scopes, so no
-Google verification review is required. Keep it in "Testing" with the admins as
-test users, or publish it.
+Vercel builds and hosts the site. Before you ship:
 
-Copy the client id and secret into `GOOGLE_CLIENT_ID` and
-`GOOGLE_CLIENT_SECRET`, generate `NEXTAUTH_SECRET` with `openssl rand -base64
-32`, and list the admins in `ADMIN_EMAILS`. **Paste each address exactly as
-Google shows it** — a Gmail dot or plus alias is a different string even though
-it reaches the same inbox, and the id token always returns the canonical form.
+- **Run migrations first.** Nothing runs them during the build. Run
+  `npm run db:migrate` against the production database before you deploy code
+  that needs the new schema.
+- **Env vars:** `DATABASE_URL` and the `R2_*` variables go in every
+  environment. The admin variables (`ADMIN_API_ENABLED`, `GOOGLE_*`,
+  `NEXTAUTH_SECRET`, `ADMIN_EMAILS`) go on **Production only**, as
+  [docs/admin.md](docs/admin.md#environment) explains. Vercel does not need
+  `NEXTAUTH_URL`.
+- **A new domain** must be added to `ALLOWED_ORIGINS` in
+  `scripts/configure-r2-cors.ts` (then run `npm run r2:cors`), and to the
+  Google OAuth client.
 
-### Security
+## Maintenance
 
-Two latches stand in front of every mutation, and both are applied in
-`requireAdmin` in `src/lib/api/admin.ts`:
+### R2 bucket CORS
 
-1. `ADMIN_API_ENABLED` must be exactly `"true"`, or every `/api/admin` route —
-   and `/api/auth` and every `/admin` page — answers `404`.
-2. A Google session whose email is in `ADMIN_EMAILS`.
+`npm run r2:cors` applies the bucket's CORS policy. Without it, these break:
+saving songs offline, downloading MP3s, and uploading kits from the admin
+panel. Run it after you change `ALLOWED_ORIGINS` in
+`scripts/configure-r2-cors.ts`.
 
-| Situation                               | Answer |
-| --------------------------------------- | ------ |
-| Kill switch off                         | `404`  |
-| Enabled, no session                     | `401`  |
-| Enabled, session, email not on the list | `403`  |
+The R2 token needs **Admin Read & Write** to apply the policy. If yours does
+not have it, the script still prints the policy, and you can paste it into
+Cloudflare under R2 → the bucket → Settings → CORS policy.
 
-`404` for the switch because the surface genuinely does not exist in that
-deployment, and a `403` would only advertise that it is there and merely
-switched off. `401` and `403` once it is on, because there is now an identity to
-challenge and a sign-in page to send people to.
+### Orphaned audio
 
-The allowlist is checked **on every request**, not only at sign-in, so removing
-an address revokes access immediately rather than whenever the session happens
-to expire (8 hours). That is what the `403` branch almost always means in
-practice.
+Deleting or replacing a kit never deletes from R2 right away. It queues the old
+object in `pending_object_deletions` with a 7-day grace period, so a chorister
+who is in the middle of listening is not cut off.
+`npm run r2:purge -- --dry-run` lists what is due, and `npm run r2:purge`
+deletes it. You never have to run it urgently: skipping it only costs storage.
+More in [docs/admin.md](docs/admin.md#replacing-and-deleting).
 
-`requireAdmin` is the only way in: every route goes through `withAdminRoute`,
-and there is no way to add one that skips it. The `/admin` pages go through
-`withAdminPage` in `src/lib/auth/page.ts`, which shares the same
-`decideAdminAccess` policy — unit tested in `src/lib/auth/admins.test.ts` — so
-the API and the UI cannot drift on who gets in.
+### Health check
 
-**To grant or revoke access**, edit `ADMIN_EMAILS` and redeploy. An empty or
-unset list admits nobody: it fails closed.
+```bash
+npx tsx scripts/verify-migration.ts
+```
 
-**On Vercel, set these on Production only.** Preview deployments get a fresh
-hostname per deploy, which Google will refuse as an unregistered redirect URI;
-leaving the kill switch unset there means previews have no admin surface at all.
-`NEXTAUTH_URL` is not needed on Vercel — the origin is derived from the
-forwarded host.
+This script checks three things: that the database is consistent, that every
+kit points at an R2 object of the right size, and that those objects are
+publicly readable with range requests (the player needs range requests to
+seek). Run it before anything destructive. It exits non-zero on failure.
 
-There is deliberately no `middleware.ts`. It would run on the Edge runtime,
-where `getServerSession` does not work, so it would need a second copy of the
-allowlist rule at the edge — exactly the drift the single chokepoint exists to
-prevent — while the API would still have to re-check anyway.
+### Shrinking an MP3
 
-### Database
-
-The migration in `drizzle/0001_*.sql` adds `songs.position` (explicit list
-ordering, backfilled from the id) and the `pending_object_deletions` table.
-Apply it with `npm run db:migrate` before running this code; the public
-`/api/musicas` endpoint orders by `position` and will fail until it is applied.
-
-### Agenda
-
-The agenda lives in the `agenda_events` table (`drizzle/0002_*.sql`). Dates and
-times are Londrina wall-clock strings with no time zone, and the public
-`/api/agenda` lists events from today in `America/Sao_Paulo` onwards, so an
-evening rehearsal stays listed until midnight here rather than 21:00 UTC.
-
-`/api/agenda` keeps the `{ events: [...] }` response it had when it read
-`json/agenda.json`. The service worker serves cached copies of it offline, so
-fields may be added (`time` was) but never renamed or removed.
-
-Moving it off the JSON file, in this order:
-
-1. `npm run db:migrate`
-2. `npx tsx scripts/seed-agenda.ts` — copies `json/agenda.json` with new ids;
-   it refuses to run on a table that already has rows
-3. deploy
-
-The public endpoint fails until steps 1 and 2 are done. Once the seeded agenda
-is confirmed in production, `json/agenda.json` and the seed script can go.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+New songs and kits are added in the admin panel, which accepts MP3s up to
+30 MB. To make a large file smaller first, put it in
+`audio-staging/<slug>/<voice>.mp3` and run `npm run optimize:audio`. The
+re-encoded file appears in `audio-staging-optimized/`, ready to upload. Git
+ignores both folders.

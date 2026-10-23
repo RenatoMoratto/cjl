@@ -7,8 +7,8 @@ const ffmpeg = require("fluent-ffmpeg");
 ffmpeg.setFfmpegPath(ffmpegPath);
 
 // Audio no longer lives in the repo. Drop new kits in audio-staging/<slug>/
-// as <voice>.mp3, optimize them here, then publish with `npm run r2:upload`.
-// Both directories are gitignored.
+// as <voice>.mp3, optimize them here, then upload the result from the admin
+// panel. Both directories are gitignored.
 const songsDir = path.join(__dirname, "../audio-staging");
 const outputDir = path.join(__dirname, "../audio-staging-optimized");
 
