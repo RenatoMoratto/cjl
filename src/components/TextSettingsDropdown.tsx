@@ -5,6 +5,7 @@ import {
   TextAlignLeft,
   DownloadSimple,
   Copy,
+  ProjectorScreen,
 } from "@phosphor-icons/react";
 import { useEffect, useId, useRef, useState } from "react";
 
@@ -32,6 +33,9 @@ type TextSettingsDropdownProps = {
   onCopyLyrics: () => void;
   /** False for a song without lyrics. */
   canCopyLyrics?: boolean;
+  onPresent: () => void;
+  /** False for a song without lyrics. */
+  canPresent?: boolean;
   offlineSaved: boolean;
   offlineSaving: boolean;
   onToggleOffline: () => void;
@@ -94,6 +98,8 @@ export default function TextSettingsDropdown({
   onChangePlaybackRate,
   onCopyLyrics,
   canCopyLyrics = true,
+  onPresent,
+  canPresent = true,
   offlineSaved,
   offlineSaving,
   onToggleOffline,
@@ -256,6 +262,18 @@ export default function TextSettingsDropdown({
           >
             <Copy size={20} />
             Copiar letra
+          </button>
+
+          <button
+            onClick={() => {
+              setOpen(false);
+              onPresent();
+            }}
+            disabled={!canPresent}
+            className={actionClass}
+          >
+            <ProjectorScreen size={20} />
+            Modo apresentação
           </button>
         </div>
       )}
