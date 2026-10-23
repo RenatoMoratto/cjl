@@ -116,10 +116,12 @@ export default function Musica() {
     hasError: audioError,
     canSetVolume,
     playbackMode,
+    playbackRate,
     updateCurrentTime,
     togglePlay,
     retry: retryAudio,
     setPlaybackMode,
+    setPlaybackRate,
     handleSeek,
     handleVolumeChange,
   } = useLocalAudioPlayer(track?.url, {
@@ -224,6 +226,8 @@ export default function Musica() {
                   canDownloadMp3={Boolean(track)}
                   downloadingMp3={isDownloading}
                   onChangeFontSize={(size) => setFontSize(size)}
+                  playbackRate={playbackRate}
+                  onChangePlaybackRate={setPlaybackRate}
                   onCopyLyrics={handleCopyLyric}
                   canCopyLyrics={hasLyrics}
                   offlineSaved={isAvailableOffline}

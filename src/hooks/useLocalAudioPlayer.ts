@@ -36,6 +36,8 @@ export function useLocalAudioPlayer(
   const [volume, setVolume] = useState(1); // range de 0 a 1
   const [isMuted, setIsMuted] = useState(false);
   const [playbackMode, setPlaybackMode] = useState<PlaybackMode>("stop");
+  // Kept from song to song, like the volume and the mode
+  const [playbackRate, setPlaybackRate] = useState(1);
 
   // Read from the element's listeners, which are added once
   const playbackModeRef = useRef(playbackMode);
@@ -129,6 +131,9 @@ export function useLocalAudioPlayer(
     audio.volume = 0.5;
     setCanSetVolume(audio.volume === 0.5);
     audio.volume = 1;
+    // Already the default where supported: slowed down for practice, the
+    // song keeps its key
+    audio.preservesPitch = true;
 
     const onLoadedMetadata = () => {
       setDuration(audio.duration);
@@ -220,6 +225,14 @@ export function useLocalAudioPlayer(
   }, [playbackMode]);
 
   useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    // Loading a file (a new song, or `retry`) resets the rate to the default
+    audio.defaultPlaybackRate = playbackRate;
+    audio.playbackRate = playbackRate;
+  }, [playbackRate]);
+
+  useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = volume;
     }
@@ -243,12 +256,14 @@ export function useLocalAudioPlayer(
     volume,
     isMuted,
     playbackMode,
+    playbackRate,
     togglePlay,
     handleSeek,
     handleVolumeChange,
     toggleMute,
     retry,
     setPlaybackMode,
+    setPlaybackRate,
     updateCurrentTime,
   };
 }

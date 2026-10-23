@@ -1,4 +1,5 @@
 import {
+  CaretDown,
   DotsThreeVertical,
   TextAlignCenter,
   TextAlignLeft,
@@ -11,16 +12,23 @@ const MIN_FONT_SIZE = 16;
 const MAX_FONT_SIZE = 32;
 const FONT_SIZE_STEP = 2;
 
+const PLAYBACK_RATES = [0.5, 0.75, 1, 1.25, 1.5, 2];
+
+// With the decimal comma: "0,75x"
+const formatRate = (rate: number) => `${String(rate).replace(".", ",")}x`;
+
 type TextSettingsDropdownProps = {
   enableReading: boolean;
   textAlign: "left" | "center";
   fontSize: number;
+  playbackRate: number;
   onToggleReading: () => void;
   onChangeTextAlign: (align: "left" | "center") => void;
   onDownloadMp3: () => void;
   canDownloadMp3?: boolean;
   downloadingMp3?: boolean;
   onChangeFontSize: (size: number) => void;
+  onChangePlaybackRate: (rate: number) => void;
   onCopyLyrics: () => void;
   /** False for a song without lyrics. */
   canCopyLyrics?: boolean;
@@ -76,12 +84,14 @@ export default function TextSettingsDropdown({
   enableReading,
   textAlign,
   fontSize,
+  playbackRate,
   onToggleReading,
   onChangeTextAlign,
   onDownloadMp3,
   canDownloadMp3 = true,
   downloadingMp3 = false,
   onChangeFontSize,
+  onChangePlaybackRate,
   onCopyLyrics,
   canCopyLyrics = true,
   offlineSaved,
@@ -187,6 +197,35 @@ export default function TextSettingsDropdown({
               </button>
             </div>
           </div>
+
+          <div className="border-t border-gray-700 my-1" />
+
+          {/* The options open apart from the menu: the phone's own picker */}
+          <label className="flex items-center justify-between gap-3 min-h-11">
+            <span>Velocidade</span>
+            {/* Its own arrow: the browser's sits against the border */}
+            <span className="relative flex items-center">
+              <select
+                value={playbackRate}
+                onChange={(event) =>
+                  onChangePlaybackRate(Number(event.target.value))
+                }
+                className="appearance-none h-9 rounded border border-gray-700 bg-gray-800 pl-3 pr-8 text-gray-200 cursor-pointer focus:border-primary focus:outline-none"
+              >
+                {PLAYBACK_RATES.map((rate) => (
+                  <option key={rate} value={rate}>
+                    {formatRate(rate)}
+                  </option>
+                ))}
+              </select>
+              <CaretDown
+                size={14}
+                weight="bold"
+                aria-hidden
+                className="pointer-events-none absolute right-2.5 text-gray-400"
+              />
+            </span>
+          </label>
 
           <div className="border-t border-gray-700 my-1" />
 
