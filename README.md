@@ -127,7 +127,10 @@ id must never change. The order of the song list is stored separately, in
 
 On the song page, the ⋯ menu holds the reading settings (synced lyrics, text
 size, alignment), the playback speed, the "Ouvir sem internet" switch, "Baixar
-MP3" and copy lyrics.
+MP3", copy lyrics and "Modo apresentação". Presentation mode fills the screen
+(the browser's full screen where it has one) with the lyrics in large type for
+the choir to sing along on a projector or TV. The player stays at the bottom,
+and the song keeps playing as it opens and closes. ✕ or Esc closes it.
 
 ### Data
 

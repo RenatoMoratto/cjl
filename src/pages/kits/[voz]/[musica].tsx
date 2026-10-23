@@ -21,6 +21,7 @@ import { FetchError } from "@/lib/fetcher";
 import { songsForVoice } from "@/lib/songs";
 // Imported directly (not lazy) so the player is part of the page's cached files offline
 import SongPlayer from "@/components/SongPlayer";
+import PresentationMode from "@/components/PresentationMode";
 
 export default function Musica() {
   const params = useParams();
@@ -39,6 +40,8 @@ export default function Musica() {
     DEFAULT_FONT_SIZE,
   );
   const [isDownloading, setIsDownloading] = useState(false);
+  // Kept across songs, so a presentation goes on through "Tocar todas"
+  const [presenting, setPresenting] = useState(false);
   const [, copyToClipboard] = useCopyToClipboard();
 
   const rawVoice = Array.isArray(params?.voz) ? params.voz[0] : params?.voz;
@@ -184,136 +187,168 @@ export default function Musica() {
     }
   };
 
+  // Full screen from the tap itself, the only time browsers allow it. Where
+  // there is none (the iPhone), the presentation still fills the page.
+  const startPresentation = () => {
+    setPresenting(true);
+    if (document.fullscreenEnabled) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
+  };
+
   // Offline, a kit that isn't saved fails to load, and retrying can't help
   const audioUnavailableOffline =
     Boolean(track) && !isAvailableOffline && !online;
 
-  return (
-    <Layout submenu title={song ? `${song.title} | CJL` : undefined}>
-      <div className="h-full w-full flex flex-col content-center gap-4">
-        <div className="h-full min-h-0 w-full p-5 flex flex-col gap-3 rounded-3xl bg-gray-800">
-          <div className="w-full grid place-items-center">
-            <div className="w-full flex items-center justify-between">
-              <Link
-                href={voice ? `/kits/${voice}` : "/kits"}
-                aria-label="Voltar"
-                className="p-2 -m-2"
-              >
-                <CaretLeft size={32} weight="bold" />
-              </Link>
-              {loading ? (
-                // One line of the title's height, like the lyric's placeholder
-                // (which tells screen readers the page is loading)
-                <div
-                  aria-hidden
-                  className="w-full h-9 text-3xl flex items-center justify-center"
-                >
-                  <div className="h-[0.75em] w-1/2 rounded-full bg-gray-700 animate-pulse" />
-                </div>
-              ) : (
-                <h2 className="w-full text-center text-3xl font-bold text-gray-50">
-                  {song?.title}
-                </h2>
-              )}
-              <div className="w-8">
-                <TextSettingsDropdown
-                  enableReading={enableReading}
-                  textAlign={textAlign}
-                  fontSize={fontSize}
-                  onToggleReading={() => setEnableReading((prev) => !prev)}
-                  onChangeTextAlign={(align) => setTextAlign(align)}
-                  onDownloadMp3={handleDownloadMp3}
-                  canDownloadMp3={Boolean(track)}
-                  downloadingMp3={isDownloading}
-                  onChangeFontSize={(size) => setFontSize(size)}
-                  playbackRate={playbackRate}
-                  onChangePlaybackRate={setPlaybackRate}
-                  onCopyLyrics={handleCopyLyric}
-                  canCopyLyrics={hasLyrics}
-                  offlineSaved={isAvailableOffline}
-                  offlineSaving={isSaving}
-                  onToggleOffline={toggleOffline}
-                />
-              </div>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-100">
-              {formattedVoice}
-            </h3>
-          </div>
+  // The lyric and the player, in the page or in the presentation. Both are
+  // fed by the one audio player above, which neither layout owns.
+  const lyrics = (
+    <>
+      {loading && <LyricsPlaceholder />}
 
-          {loading && <LyricsPlaceholder />}
-
-          {(error || isTrackUnavailable) && (
-            <div className="text-center">
-              {error && (
-                <LoadError
-                  message={error}
-                  onRetry={canRetry ? () => mutate() : undefined}
-                  retrying={isValidating}
-                />
-              )}
-              {isTrackUnavailable && (
-                <p className="text-gray-100">
-                  Kit de voz indisponível para esta música.
-                </p>
-              )}
-            </div>
+      {(error || isTrackUnavailable) && (
+        <div className="text-center">
+          {error && (
+            <LoadError
+              message={error}
+              onRetry={canRetry ? () => mutate() : undefined}
+              retrying={isValidating}
+            />
           )}
-
-          {/* Before the kit has failed to load; after, the player says it */}
-          {audioUnavailableOffline && !audioError && (
-            <p className="text-center text-red-500">
-              Áudio não disponível offline
+          {isTrackUnavailable && (
+            <p className="text-gray-100">
+              Kit de voz indisponível para esta música.
             </p>
           )}
+        </div>
+      )}
 
-          {song && (
-            <TextReader
-              // A new song starts at the top, following its lyric
-              key={song.id}
-              lyrics={song.lyrics}
-              currentTime={currentTime}
-              enableReading={enableReading}
-              updateCurrentTime={updateCurrentTime}
-              textAlign={textAlign}
-              fontSize={fontSize}
-            />
+      {/* Before the kit has failed to load; after, the player says it */}
+      {audioUnavailableOffline && !audioError && (
+        <p className="text-center text-red-500">Áudio não disponível offline</p>
+      )}
+
+      {song && (
+        <TextReader
+          // A new song starts at the top, following its lyric
+          key={song.id}
+          lyrics={song.lyrics}
+          currentTime={currentTime}
+          enableReading={enableReading}
+          updateCurrentTime={updateCurrentTime}
+          textAlign={textAlign}
+          fontSize={fontSize}
+        />
+      )}
+    </>
+  );
+
+  const player = (
+    <>
+      {/* The controls stay, to move on to another song */}
+      {audioError && (
+        <LoadError
+          message={
+            audioUnavailableOffline
+              ? "Áudio não disponível offline."
+              : "Não foi possível carregar o áudio."
+          }
+          onRetry={audioUnavailableOffline ? undefined : retryAudio}
+        />
+      )}
+      <SongPlayer
+        currentTime={currentTime}
+        duration={duration}
+        isPlaying={isPlaying}
+        isBuffering={isBuffering}
+        canSetVolume={canSetVolume}
+        togglePlay={togglePlay}
+        playbackMode={playbackMode}
+        setPlaybackMode={setPlaybackMode}
+        handleSeek={handleSeek}
+        volume={volume}
+        handleVolumeChange={handleVolumeChange}
+        onPrevious={() => goToSong(previousSong, isPlaying)}
+        onNext={() => goToSong(nextSong, isPlaying)}
+        hasPrevious={Boolean(previousSong)}
+        hasNext={Boolean(nextSong)}
+      />
+    </>
+  );
+
+  return (
+    <Layout submenu title={song ? `${song.title} | CJL` : undefined}>
+      {presenting ? (
+        <PresentationMode
+          title={song?.title}
+          lyrics={lyrics}
+          player={isTrackUnavailable ? undefined : player}
+          onExit={() => setPresenting(false)}
+        />
+      ) : (
+        <div className="h-full w-full flex flex-col content-center gap-4">
+          <div className="h-full min-h-0 w-full p-5 flex flex-col gap-3 rounded-3xl bg-gray-800">
+            <div className="w-full grid place-items-center">
+              <div className="w-full flex items-center justify-between">
+                <Link
+                  href={voice ? `/kits/${voice}` : "/kits"}
+                  aria-label="Voltar"
+                  className="p-2 -m-2"
+                >
+                  <CaretLeft size={32} weight="bold" />
+                </Link>
+                {loading ? (
+                  // One line of the title's height, like the lyric's placeholder
+                  // (which tells screen readers the page is loading)
+                  <div
+                    aria-hidden
+                    className="w-full h-9 text-3xl flex items-center justify-center"
+                  >
+                    <div className="h-[0.75em] w-1/2 rounded-full bg-gray-700 animate-pulse" />
+                  </div>
+                ) : (
+                  <h2 className="w-full text-center text-3xl font-bold text-gray-50">
+                    {song?.title}
+                  </h2>
+                )}
+                <div className="w-8">
+                  <TextSettingsDropdown
+                    enableReading={enableReading}
+                    textAlign={textAlign}
+                    fontSize={fontSize}
+                    onToggleReading={() => setEnableReading((prev) => !prev)}
+                    onChangeTextAlign={(align) => setTextAlign(align)}
+                    onDownloadMp3={handleDownloadMp3}
+                    canDownloadMp3={Boolean(track)}
+                    downloadingMp3={isDownloading}
+                    onChangeFontSize={(size) => setFontSize(size)}
+                    playbackRate={playbackRate}
+                    onChangePlaybackRate={setPlaybackRate}
+                    onCopyLyrics={handleCopyLyric}
+                    canCopyLyrics={hasLyrics}
+                    onPresent={startPresentation}
+                    canPresent={hasLyrics}
+                    offlineSaved={isAvailableOffline}
+                    offlineSaving={isSaving}
+                    onToggleOffline={toggleOffline}
+                  />
+                </div>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-100">
+                {formattedVoice}
+              </h3>
+            </div>
+
+            {lyrics}
+          </div>
+
+          {!isTrackUnavailable && (
+            <div className="w-full p-5 rounded-3xl bg-gray-800 flex flex-col gap-4">
+              {player}
+            </div>
           )}
         </div>
-
-        {!isTrackUnavailable && (
-          <div className="w-full p-5 rounded-3xl bg-gray-800 flex flex-col gap-4">
-            {/* The controls stay, to move on to another song */}
-            {audioError && (
-              <LoadError
-                message={
-                  audioUnavailableOffline
-                    ? "Áudio não disponível offline."
-                    : "Não foi possível carregar o áudio."
-                }
-                onRetry={audioUnavailableOffline ? undefined : retryAudio}
-              />
-            )}
-            <SongPlayer
-              currentTime={currentTime}
-              duration={duration}
-              isPlaying={isPlaying}
-              isBuffering={isBuffering}
-              canSetVolume={canSetVolume}
-              togglePlay={togglePlay}
-              playbackMode={playbackMode}
-              setPlaybackMode={setPlaybackMode}
-              handleSeek={handleSeek}
-              volume={volume}
-              handleVolumeChange={handleVolumeChange}
-              onPrevious={() => goToSong(previousSong, isPlaying)}
-              onNext={() => goToSong(nextSong, isPlaying)}
-              hasPrevious={Boolean(previousSong)}
-              hasNext={Boolean(nextSong)}
-            />
-          </div>
-        )}
-      </div>
+      )}
     </Layout>
   );
 }
