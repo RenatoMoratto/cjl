@@ -3,7 +3,8 @@ import { Lines, Lyrics } from "@/types";
 import { useEffect, useRef, useState } from "react";
 
 // The size setting is in pixels at the usual 16px text size, and is applied
-// relative to the device's text size, so a larger system font enlarges it
+// relative to the surrounding text, so presentation mode's larger type
+// enlarges it
 const toEm = (size: number) => `${size / 16}em`;
 
 /** The reader's text size until the user changes it. */

@@ -58,8 +58,6 @@ export default function Document() {
       <Head>
         {/* Primary Meta Tags */}
         <meta charSet="UTF-8" />
-        {/* Chrome on Android sizes the page from the phone's text size */}
-        <meta name="text-scale" content="scale" />
         <meta name="author" content="Coral Jovem de Londrina" />
         <meta
           name="description"
