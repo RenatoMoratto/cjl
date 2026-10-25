@@ -6,6 +6,7 @@ import {
   DownloadSimple,
   Copy,
   ProjectorScreen,
+  ShareNetwork,
 } from "@phosphor-icons/react";
 import { useEffect, useId, useRef, useState } from "react";
 
@@ -36,6 +37,8 @@ type TextSettingsDropdownProps = {
   onPresent: () => void;
   /** False for a song without lyrics. */
   canPresent?: boolean;
+  onShare: () => void;
+  canShare?: boolean;
   offlineSaved: boolean;
   offlineSaving: boolean;
   onToggleOffline: () => void;
@@ -100,6 +103,8 @@ export default function TextSettingsDropdown({
   canCopyLyrics = true,
   onPresent,
   canPresent = true,
+  onShare,
+  canShare = true,
   offlineSaved,
   offlineSaving,
   onToggleOffline,
@@ -274,6 +279,18 @@ export default function TextSettingsDropdown({
           >
             <ProjectorScreen size={20} />
             Modo apresentação
+          </button>
+
+          <button
+            onClick={() => {
+              setOpen(false);
+              onShare();
+            }}
+            disabled={!canShare}
+            className={actionClass}
+          >
+            <ShareNetwork size={20} />
+            Compartilhar
           </button>
         </div>
       )}

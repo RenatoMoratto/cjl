@@ -1,5 +1,18 @@
 import type { NextConfig } from "next";
 
+// The apps that fetch a shared link to preview it, by their user agents.
+// Search engines are left out: they run the page's scripts.
+const LINK_PREVIEW_AGENTS = [
+  "facebookexternalhit", // Facebook, Instagram, Messenger, and iMessage too
+  "WhatsApp", // and Signal, which sends WhatsApp's
+  "TelegramBot",
+  "Twitterbot",
+  "Discordbot",
+  "Slackbot",
+  "LinkedInBot",
+  "SkypeUriPreview", // Teams
+];
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
@@ -19,6 +32,26 @@ const nextConfig: NextConfig = {
   },
   // Enable compression
   compress: true,
+  // The song page's HTML is the same for every song, so a link preview would
+  // only show the site's name. The preview apps get the song's title from
+  // here instead (see the route), and people still get the page.
+  async rewrites() {
+    return {
+      beforeFiles: [
+        {
+          source: "/kits/:voz/:musica",
+          has: [
+            {
+              type: "header",
+              key: "user-agent",
+              value: `.*(${LINK_PREVIEW_AGENTS.join("|")}).*`,
+            },
+          ],
+          destination: "/api/musicas/:musica/previa?voz=:voz",
+        },
+      ],
+    };
+  },
   async headers() {
     return [
       {

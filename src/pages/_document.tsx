@@ -1,10 +1,5 @@
 import { Html, Head, Main, NextScript } from "next/document";
-
-/** Absolute base for social-card URLs, without a trailing slash. */
-const SITE_URL = "https://coraljovemlondrina.com.br";
-
-// A small JPEG: link previews (WhatsApp in particular) skip large or WebP images
-const SOCIAL_IMAGE_URL = `${SITE_URL}/images/og.jpg`;
+import { SITE_URL, SOCIAL_IMAGE } from "@/lib/site";
 
 // iOS shows a white screen while the installed app starts unless there is a
 // launch image of the exact screen size. Ours are plain background, so the
@@ -82,10 +77,13 @@ export default function Document() {
           property="og:description"
           content="Com fé e propósito, damos voz à nossa missão. A mensagem do advento a todo mundo em nossa geração."
         />
-        <meta property="og:image" content={SOCIAL_IMAGE_URL} />
+        <meta property="og:image" content={SOCIAL_IMAGE.url} />
         <meta property="og:image:type" content="image/jpeg" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="1205" />
+        <meta property="og:image:width" content={String(SOCIAL_IMAGE.width)} />
+        <meta
+          property="og:image:height"
+          content={String(SOCIAL_IMAGE.height)}
+        />
         <meta property="og:url" content={SITE_URL} />
         <meta property="og:site_name" content="Coral Jovem de Londrina" />
 
@@ -96,7 +94,7 @@ export default function Document() {
           name="twitter:description"
           content="Com fé e propósito, damos voz à nossa missão. A mensagem do advento a todo mundo em nossa geração."
         />
-        <meta name="twitter:image" content={SOCIAL_IMAGE_URL} />
+        <meta name="twitter:image" content={SOCIAL_IMAGE.url} />
 
         {/* Favicon */}
         <link rel="icon" href="/favicon.ico" />
