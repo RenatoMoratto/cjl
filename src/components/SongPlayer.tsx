@@ -137,8 +137,7 @@ function SongPlayer({
         </div>
       </div>
 
-      {/* Controls: the icons keep their size, so with a larger text size the
-          gaps narrow (down from 24px) instead of pushing them out of the card */}
+      {/* Controls: the gaps narrow (down from 24px) on a narrow card */}
       <div className="w-full max-w-[272px] flex items-center justify-between">
         {/* Playback Mode Button */}
         <button

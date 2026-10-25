@@ -121,7 +121,7 @@ export default function Songs() {
                     className={!savedOffline && !online ? "opacity-50" : ""}
                   >
                     <div className="bg-gray-700 w-full min-h-20 rounded-xl flex gap-2">
-                      {/* Fills the row, which grows with the text size */}
+                      {/* Fills the row, which grows when the title wraps */}
                       <div className="relative w-[100px] shrink-0">
                         <Image
                           src={song.imageUrl}
