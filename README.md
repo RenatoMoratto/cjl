@@ -127,10 +127,26 @@ id must never change. The order of the song list is stored separately, in
 
 On the song page, the ⋯ menu holds the reading settings (synced lyrics, text
 size, alignment), the playback speed, the "Ouvir sem internet" switch, "Baixar
-MP3", copy lyrics and "Modo apresentação". Presentation mode fills the screen
-(the browser's full screen where it has one) with the lyrics in large type for
-the choir to sing along on a projector or TV. The player stays at the bottom,
-and the song keeps playing as it opens and closes. ✕ or Esc closes it.
+MP3", copy lyrics, "Modo apresentação" and "Compartilhar". Presentation mode
+fills the screen (the browser's full screen where it has one) with the lyrics
+in large type for the choir to sing along on a projector or TV. The player
+stays at the bottom, and the song keeps playing as it opens and closes. ✕ or
+Esc closes it. "Compartilhar" opens the phone's share sheet with the song's
+link, for the voice being played. Where the browser has no share sheet, it
+copies the link.
+
+### Link previews
+
+Apps such as WhatsApp read a shared link's HTML to show its preview, without
+running its scripts. The pages are prerendered, so that HTML only names the
+site. `next.config.ts` sends those apps, recognised by their user agent
+(`LINK_PREVIEW_AGENTS`), to `/api/musicas/[id]/previa`, which answers with the
+song's title. Browsers still get the page. An app missing from the list shows
+the site's generic preview. To see what an app gets:
+
+```bash
+curl -A WhatsApp https://coraljovemlondrina.com.br/kits/soprano/1
+```
 
 ### Data
 

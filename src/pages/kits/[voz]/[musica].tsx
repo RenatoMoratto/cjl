@@ -187,6 +187,34 @@ export default function Musica() {
     }
   };
 
+  // The song's own address, without "Tocar todas" or anything else in the
+  // query. The phone's share sheet where there is one, otherwise the link is
+  // copied. Shared from the tap itself, the only time browsers allow it.
+  const handleShare = async () => {
+    if (!song || !voice) return;
+    const url = `${window.location.origin}/kits/${voice}/${song.id}`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: song.title, url });
+        return;
+      } catch (error) {
+        // Closing the share sheet
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+        // Some in-app browsers have the API but refuse it: copy instead
+        console.error("Failed to share song", error);
+      }
+    }
+
+    if (await copyToClipboard(url)) {
+      toast.success("Link copiado");
+    } else {
+      toast.error("Não foi possível copiar o link");
+    }
+  };
+
   // Full screen from the tap itself, the only time browsers allow it. Where
   // there is none (the iPhone), the presentation still fills the page.
   const startPresentation = () => {
@@ -328,6 +356,8 @@ export default function Musica() {
                     canCopyLyrics={hasLyrics}
                     onPresent={startPresentation}
                     canPresent={hasLyrics}
+                    onShare={handleShare}
+                    canShare={Boolean(song && voice)}
                     offlineSaved={isAvailableOffline}
                     offlineSaving={isSaving}
                     onToggleOffline={toggleOffline}
