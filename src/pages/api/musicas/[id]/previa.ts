@@ -46,9 +46,10 @@ export default async function handler(
       return res.status(404).send("Música não encontrada");
     }
 
-    const title = escapeHtml(song.title);
     const formattedVoice = voice.charAt(0).toUpperCase() + voice.slice(1);
-    const description = `Kit de voz ${formattedVoice} · Coral Jovem de Londrina`;
+    // Named like the MP3 download, and like the share sheet's title
+    const title = escapeHtml(`${song.title} - ${formattedVoice}`);
+    const description = "Kit de voz do Coral Jovem de Londrina";
     const url = `${SITE_URL}/kits/${voice}/${song.id}`;
 
     res.setHeader("Content-Type", "text/html; charset=utf-8");

@@ -196,7 +196,10 @@ export default function Musica() {
 
     if (navigator.share) {
       try {
-        await navigator.share({ title: song.title, url });
+        await navigator.share({
+          title: `${song.title} - ${formattedVoice}`,
+          url,
+        });
         return;
       } catch (error) {
         // Closing the share sheet
