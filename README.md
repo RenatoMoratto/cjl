@@ -141,8 +141,8 @@ Apps such as WhatsApp read a shared link's HTML to show its preview, without
 running its scripts. The pages are prerendered, so that HTML only names the
 site. `next.config.ts` sends those apps, recognised by their user agent
 (`LINK_PREVIEW_AGENTS`), to `/api/musicas/[id]/previa`, which answers with the
-song's title. Browsers still get the page. An app missing from the list shows
-the site's generic preview. To see what an app gets:
+song's title and voice. Browsers still get the page. An app missing from the
+list shows the site's generic preview. To see what an app gets:
 
 ```bash
 curl -A WhatsApp https://coraljovemlondrina.com.br/kits/soprano/1
